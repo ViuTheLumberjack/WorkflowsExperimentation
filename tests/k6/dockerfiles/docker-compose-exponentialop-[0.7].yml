@@ -1,0 +1,14 @@
+services:
+  service_0:
+    container_name: exponentialop_0
+    cpuset: '0'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: 1024M
+    image: jboss/wildfly:latest
+    ports:
+    - 8080:8080
+    volumes:
+    - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
