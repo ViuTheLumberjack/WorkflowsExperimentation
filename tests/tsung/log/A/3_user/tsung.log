@@ -1,0 +1,804 @@
+{
+    "stats": [
+        {
+            "timestamp": 1736281780,
+            "samples": []
+        },
+        {
+            "timestamp": 1736281790,
+            "samples": [
+                {
+                    "name": "users",
+                    "value": 0,
+                    "max": 4
+                },
+                {
+                    "name": "cpu",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 9.414452724086726,
+                    "stddev": 0,
+                    "max": 9.414452724086726,
+                    "min": 9.414452724086726,
+                    "global_mean": 0,
+                    "global_count": 0
+                },
+                {
+                    "name": "load",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 0.37890625,
+                    "stddev": 0,
+                    "max": 0.37890625,
+                    "min": 0.37890625,
+                    "global_mean": 0,
+                    "global_count": 0
+                },
+                {
+                    "name": "freemem",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 2896.09765625,
+                    "stddev": 0,
+                    "max": 2896.09765625,
+                    "min": 2896.09765625,
+                    "global_mean": 0,
+                    "global_count": 0
+                },
+                {
+                    "name": "session",
+                    "value": 322,
+                    "mean": 11.678021739130443,
+                    "stddev": 6.447045684057346,
+                    "max": 87.904,
+                    "min": 8.319,
+                    "global_mean": 0,
+                    "global_count": 0
+                },
+                {
+                    "name": "users_count",
+                    "value": 322,
+                    "total": 322
+                },
+                {
+                    "name": "finish_users_count",
+                    "value": 322,
+                    "total": 322
+                },
+                {
+                    "name": "request",
+                    "value": 307,
+                    "mean": 9.919377850162865,
+                    "stddev": 6.561400501017576,
+                    "max": 86.499,
+                    "min": 6.883,
+                    "global_mean": 0,
+                    "global_count": 0
+                },
+                {
+                    "name": "connect",
+                    "value": 307,
+                    "mean": 0.8003420195439738,
+                    "stddev": 0.2085125004099078,
+                    "max": 1.839,
+                    "min": 0.517,
+                    "global_mean": 0,
+                    "global_count": 0
+                },
+                {
+                    "name": "page",
+                    "value": 307,
+                    "mean": 9.919377850162865,
+                    "stddev": 6.561400501017576,
+                    "max": 86.499,
+                    "min": 6.883,
+                    "global_mean": 0,
+                    "global_count": 0
+                },
+                {
+                    "name": "http_200",
+                    "value": 307,
+                    "total": 307
+                },
+                {
+                    "name": "size_rcv",
+                    "value": 90913,
+                    "total": 90913
+                },
+                {
+                    "name": "size_sent",
+                    "value": 24867,
+                    "total": 24867
+                },
+                {
+                    "name": "connected",
+                    "value": 0,
+                    "max": 0
+                }
+            ]
+        },
+        {
+            "timestamp": 1736281800,
+            "samples": [
+                {
+                    "name": "users",
+                    "value": 0,
+                    "max": 4
+                },
+                {
+                    "name": "cpu",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 7.087386577290935,
+                    "stddev": 0.0,
+                    "max": 9.414452724086726,
+                    "min": 7.087386577290935,
+                    "global_mean": 9.414452724086726,
+                    "global_count": 1
+                },
+                {
+                    "name": "load",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 0.3203125,
+                    "stddev": 0.0,
+                    "max": 0.37890625,
+                    "min": 0.3203125,
+                    "global_mean": 0.37890625,
+                    "global_count": 1
+                },
+                {
+                    "name": "freemem",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 2889.84375,
+                    "stddev": 0.0,
+                    "max": 2896.09765625,
+                    "min": 2889.84375,
+                    "global_mean": 2896.09765625,
+                    "global_count": 1
+                },
+                {
+                    "name": "session",
+                    "value": 366,
+                    "mean": 11.474437158469959,
+                    "stddev": 5.375223718321615,
+                    "max": 87.904,
+                    "min": 8.284,
+                    "global_mean": 11.678021739130443,
+                    "global_count": 322
+                },
+                {
+                    "name": "users_count",
+                    "value": 366,
+                    "total": 688
+                },
+                {
+                    "name": "finish_users_count",
+                    "value": 366,
+                    "total": 688
+                },
+                {
+                    "name": "request",
+                    "value": 362,
+                    "mean": 9.641511049723768,
+                    "stddev": 5.400657081583806,
+                    "max": 86.499,
+                    "min": 6.731,
+                    "global_mean": 9.919377850162865,
+                    "global_count": 307
+                },
+                {
+                    "name": "connect",
+                    "value": 362,
+                    "mean": 0.8126243093922648,
+                    "stddev": 0.2103936648658493,
+                    "max": 1.839,
+                    "min": 0.491,
+                    "global_mean": 0.8003420195439738,
+                    "global_count": 307
+                },
+                {
+                    "name": "page",
+                    "value": 362,
+                    "mean": 9.641511049723768,
+                    "stddev": 5.400657081583806,
+                    "max": 86.499,
+                    "min": 6.731,
+                    "global_mean": 9.919377850162865,
+                    "global_count": 307
+                },
+                {
+                    "name": "http_200",
+                    "value": 362,
+                    "total": 669
+                },
+                {
+                    "name": "size_rcv",
+                    "value": 107196,
+                    "total": 198109
+                },
+                {
+                    "name": "size_sent",
+                    "value": 29322,
+                    "total": 54189
+                },
+                {
+                    "name": "connected",
+                    "value": 0,
+                    "max": 0
+                }
+            ]
+        },
+        {
+            "timestamp": 1736281810,
+            "samples": [
+                {
+                    "name": "users",
+                    "value": 0,
+                    "max": 6
+                },
+                {
+                    "name": "cpu",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 6.884385000410273,
+                    "stddev": 0.0,
+                    "max": 9.414452724086726,
+                    "min": 6.884385000410273,
+                    "global_mean": 8.25091965068883,
+                    "global_count": 2
+                },
+                {
+                    "name": "load",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 0.26953125,
+                    "stddev": 0.0,
+                    "max": 0.37890625,
+                    "min": 0.26953125,
+                    "global_mean": 0.349609375,
+                    "global_count": 2
+                },
+                {
+                    "name": "freemem",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 2885.11328125,
+                    "stddev": 0.0,
+                    "max": 2896.09765625,
+                    "min": 2885.11328125,
+                    "global_mean": 2892.970703125,
+                    "global_count": 2
+                },
+                {
+                    "name": "session",
+                    "value": 410,
+                    "mean": 11.877190243902445,
+                    "stddev": 6.365379721810135,
+                    "max": 87.904,
+                    "min": 8.229,
+                    "global_mean": 11.569719476744197,
+                    "global_count": 688
+                },
+                {
+                    "name": "users_count",
+                    "value": 410,
+                    "total": 1098
+                },
+                {
+                    "name": "finish_users_count",
+                    "value": 410,
+                    "total": 1098
+                },
+                {
+                    "name": "request",
+                    "value": 408,
+                    "mean": 9.993914215686283,
+                    "stddev": 6.281380990049152,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.76902242152467,
+                    "global_count": 669
+                },
+                {
+                    "name": "connect",
+                    "value": 408,
+                    "mean": 0.786803921568627,
+                    "stddev": 0.20077244407125902,
+                    "max": 1.865,
+                    "min": 0.487,
+                    "global_mean": 0.8069880418535124,
+                    "global_count": 669
+                },
+                {
+                    "name": "page",
+                    "value": 408,
+                    "mean": 9.993914215686283,
+                    "stddev": 6.281380990049152,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.76902242152467,
+                    "global_count": 669
+                },
+                {
+                    "name": "http_200",
+                    "value": 408,
+                    "total": 1077
+                },
+                {
+                    "name": "size_rcv",
+                    "value": 120837,
+                    "total": 318946
+                },
+                {
+                    "name": "size_sent",
+                    "value": 33048,
+                    "total": 87237
+                },
+                {
+                    "name": "connected",
+                    "value": 0,
+                    "max": 0
+                }
+            ]
+        },
+        {
+            "timestamp": 1736281820,
+            "samples": [
+                {
+                    "name": "users",
+                    "value": 0,
+                    "max": 6
+                },
+                {
+                    "name": "cpu",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 7.3214577545350545,
+                    "stddev": 0.0,
+                    "max": 9.414452724086726,
+                    "min": 6.884385000410273,
+                    "global_mean": 7.795408100595978,
+                    "global_count": 3
+                },
+                {
+                    "name": "load",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 0.37890625,
+                    "stddev": 0.0,
+                    "max": 0.37890625,
+                    "min": 0.26953125,
+                    "global_mean": 0.3229166666666667,
+                    "global_count": 3
+                },
+                {
+                    "name": "freemem",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 2882.94921875,
+                    "stddev": 0.0,
+                    "max": 2896.09765625,
+                    "min": 2882.94921875,
+                    "global_mean": 2890.3515625,
+                    "global_count": 3
+                },
+                {
+                    "name": "session",
+                    "value": 365,
+                    "mean": 11.309783561643828,
+                    "stddev": 5.025581013204117,
+                    "max": 87.904,
+                    "min": 8.229,
+                    "global_mean": 11.68453096539163,
+                    "global_count": 1098
+                },
+                {
+                    "name": "users_count",
+                    "value": 365,
+                    "total": 1463
+                },
+                {
+                    "name": "finish_users_count",
+                    "value": 365,
+                    "total": 1463
+                },
+                {
+                    "name": "request",
+                    "value": 371,
+                    "mean": 9.603501347708875,
+                    "stddev": 5.07921226747657,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.854218198700101,
+                    "global_count": 1077
+                },
+                {
+                    "name": "connect",
+                    "value": 371,
+                    "mean": 0.7903530997304576,
+                    "stddev": 0.20148165958238878,
+                    "max": 1.865,
+                    "min": 0.487,
+                    "global_mean": 0.799341689879294,
+                    "global_count": 1077
+                },
+                {
+                    "name": "page",
+                    "value": 371,
+                    "mean": 9.603501347708875,
+                    "stddev": 5.07921226747657,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.854218198700101,
+                    "global_count": 1077
+                },
+                {
+                    "name": "http_200",
+                    "value": 371,
+                    "total": 1448
+                },
+                {
+                    "name": "size_rcv",
+                    "value": 109867,
+                    "total": 428813
+                },
+                {
+                    "name": "size_sent",
+                    "value": 30051,
+                    "total": 117288
+                },
+                {
+                    "name": "connected",
+                    "value": 0,
+                    "max": 0
+                }
+            ]
+        },
+        {
+            "timestamp": 1736281830,
+            "samples": [
+                {
+                    "name": "users",
+                    "value": 1,
+                    "max": 6
+                },
+                {
+                    "name": "cpu",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 7.2926909210095054,
+                    "stddev": 0.0,
+                    "max": 9.414452724086726,
+                    "min": 6.884385000410273,
+                    "global_mean": 7.676920514080747,
+                    "global_count": 4
+                },
+                {
+                    "name": "load",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 0.390625,
+                    "stddev": 0.0,
+                    "max": 0.390625,
+                    "min": 0.26953125,
+                    "global_mean": 0.3369140625,
+                    "global_count": 4
+                },
+                {
+                    "name": "freemem",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 2885.4140625,
+                    "stddev": 0.0,
+                    "max": 2896.09765625,
+                    "min": 2882.94921875,
+                    "global_mean": 2888.5009765625,
+                    "global_count": 4
+                },
+                {
+                    "name": "session",
+                    "value": 394,
+                    "mean": 12.018903553299491,
+                    "stddev": 7.070780174060415,
+                    "max": 87.904,
+                    "min": 8.229,
+                    "global_mean": 11.591036226930969,
+                    "global_count": 1463
+                },
+                {
+                    "name": "users_count",
+                    "value": 395,
+                    "total": 1858
+                },
+                {
+                    "name": "finish_users_count",
+                    "value": 394,
+                    "total": 1857
+                },
+                {
+                    "name": "request",
+                    "value": 400,
+                    "mean": 10.198940000000011,
+                    "stddev": 7.021354299663276,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.789980662983426,
+                    "global_count": 1448
+                },
+                {
+                    "name": "connect",
+                    "value": 400,
+                    "mean": 0.8028900000000001,
+                    "stddev": 0.1833276517604477,
+                    "max": 1.865,
+                    "min": 0.487,
+                    "global_mean": 0.7970386740331488,
+                    "global_count": 1448
+                },
+                {
+                    "name": "page",
+                    "value": 400,
+                    "mean": 10.198940000000011,
+                    "stddev": 7.021354299663276,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.789980662983426,
+                    "global_count": 1448
+                },
+                {
+                    "name": "http_200",
+                    "value": 400,
+                    "total": 1848
+                },
+                {
+                    "name": "size_rcv",
+                    "value": 118465,
+                    "total": 547278
+                },
+                {
+                    "name": "size_sent",
+                    "value": 32400,
+                    "total": 149688
+                },
+                {
+                    "name": "connected",
+                    "value": 0,
+                    "max": 0
+                }
+            ]
+        },
+        {
+            "timestamp": 1736281840,
+            "samples": [
+                {
+                    "name": "users",
+                    "value": 0,
+                    "max": 6
+                },
+                {
+                    "name": "cpu",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 7.425257310896913,
+                    "stddev": 0.0,
+                    "max": 9.414452724086726,
+                    "min": 6.884385000410273,
+                    "global_mean": 7.600074595466498,
+                    "global_count": 5
+                },
+                {
+                    "name": "load",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 0.41015625,
+                    "stddev": 0.0,
+                    "max": 0.41015625,
+                    "min": 0.26953125,
+                    "global_mean": 0.34765625,
+                    "global_count": 5
+                },
+                {
+                    "name": "freemem",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 1,
+                    "mean": 2879.9375,
+                    "stddev": 0.0,
+                    "max": 2896.09765625,
+                    "min": 2879.9375,
+                    "global_mean": 2887.88359375,
+                    "global_count": 5
+                },
+                {
+                    "name": "session",
+                    "value": 352,
+                    "mean": 11.824948863636367,
+                    "stddev": 6.326668987732769,
+                    "max": 87.904,
+                    "min": 8.229,
+                    "global_mean": 11.681816908993005,
+                    "global_count": 1857
+                },
+                {
+                    "name": "users_count",
+                    "value": 351,
+                    "total": 2209
+                },
+                {
+                    "name": "finish_users_count",
+                    "value": 352,
+                    "total": 2209
+                },
+                {
+                    "name": "request",
+                    "value": 351,
+                    "mean": 10.052193732193732,
+                    "stddev": 6.346427780649794,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.878500000000004,
+                    "global_count": 1848
+                },
+                {
+                    "name": "connect",
+                    "value": 351,
+                    "mean": 0.8010427350427354,
+                    "stddev": 0.18928620124030152,
+                    "max": 1.865,
+                    "min": 0.487,
+                    "global_mean": 0.7983051948051946,
+                    "global_count": 1848
+                },
+                {
+                    "name": "page",
+                    "value": 351,
+                    "mean": 10.052193732193732,
+                    "stddev": 6.346427780649794,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.878500000000004,
+                    "global_count": 1848
+                },
+                {
+                    "name": "http_200",
+                    "value": 351,
+                    "total": 2199
+                },
+                {
+                    "name": "size_rcv",
+                    "value": 103950,
+                    "total": 651228
+                },
+                {
+                    "name": "size_sent",
+                    "value": 28431,
+                    "total": 178119
+                },
+                {
+                    "name": "connected",
+                    "value": 0,
+                    "max": 0
+                }
+            ]
+        },
+        {
+            "timestamp": 1736281841,
+            "samples": [
+                {
+                    "name": "users",
+                    "value": 0,
+                    "max": 6
+                },
+                {
+                    "name": "cpu",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 0,
+                    "mean": 0,
+                    "stddev": 0,
+                    "max": 9.414452724086726,
+                    "min": 6.884385000410273,
+                    "global_mean": 7.570938381371566,
+                    "global_count": 6
+                },
+                {
+                    "name": "load",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 0,
+                    "mean": 0,
+                    "stddev": 0,
+                    "max": 0.41015625,
+                    "min": 0.26953125,
+                    "global_mean": 0.3580729166666667,
+                    "global_count": 6
+                },
+                {
+                    "name": "freemem",
+                    "hostname": "Silviu-Lenovo",
+                    "value": 0,
+                    "mean": 0,
+                    "stddev": 0,
+                    "max": 2896.09765625,
+                    "min": 2879.9375,
+                    "global_mean": 2886.5592447916665,
+                    "global_count": 6
+                },
+                {
+                    "name": "session",
+                    "value": 34,
+                    "mean": 11.130323529411767,
+                    "stddev": 3.1252887463832666,
+                    "max": 87.904,
+                    "min": 8.229,
+                    "global_mean": 11.704624717066551,
+                    "global_count": 2209
+                },
+                {
+                    "name": "users_count",
+                    "value": 34,
+                    "total": 2243
+                },
+                {
+                    "name": "finish_users_count",
+                    "value": 34,
+                    "total": 2243
+                },
+                {
+                    "name": "http_200",
+                    "value": 31,
+                    "total": 2230
+                },
+                {
+                    "name": "connect",
+                    "value": 31,
+                    "mean": 0.801709677419355,
+                    "stddev": 0.22270147725343828,
+                    "max": 1.865,
+                    "min": 0.487,
+                    "global_mean": 0.7987421555252386,
+                    "global_count": 2199
+                },
+                {
+                    "name": "page",
+                    "value": 31,
+                    "mean": 9.16209677419355,
+                    "stddev": 3.168080169183964,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.906224647567079,
+                    "global_count": 2199
+                },
+                {
+                    "name": "request",
+                    "value": 31,
+                    "mean": 9.16209677419355,
+                    "stddev": 3.168080169183964,
+                    "max": 86.499,
+                    "min": 6.691,
+                    "global_mean": 9.906224647567079,
+                    "global_count": 2199
+                },
+                {
+                    "name": "size_rcv",
+                    "value": 9182,
+                    "total": 660410
+                },
+                {
+                    "name": "size_sent",
+                    "value": 2511,
+                    "total": 180630
+                },
+                {
+                    "name": "connected",
+                    "value": 0,
+                    "max": 0
+                },
+                {
+                    "name": "error_abort",
+                    "value": 1,
+                    "total": 1
+                }
+            ]
+        }
+    ]
+}

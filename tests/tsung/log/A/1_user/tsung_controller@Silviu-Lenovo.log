@@ -1,0 +1,147 @@
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(5:<0.135.0>) Config server started, logdir is "/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/tsung/log/A/20250107-2127"
+ 
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+              ts_mon:(5:<0.118.0>) starting monitor, global 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+           ts_config:(5:<0.135.0>) Reading config file from stdin
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+           ts_config:(5:<0.135.0>) Session name for id 1 is "first"
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(4:<0.135.0>) SYSINFO:Tsung version: 1.8.0
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(4:<0.135.0>) SYSINFO:Erlang version: Erlang/OTP 25 [erts-13.2.2.5] [source] [64-bit] [smp:12:12] [ds:12:12:10] [async-threads:8] [jit:ns]
+
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(4:<0.135.0>) SYSINFO:System architecture x86_64-pc-linux-gnu
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(4:<0.135.0>) SYSINFO:Current path: /usr/lib/tsung/tsung-1.8.0/ebin/tsung.beam
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+       ts_job_notify:(6:<0.148.0>) No listen port defined, can't open listening socket (don't worry: it's normal if you don't use job notifications) 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_os_mon_erlang:(6:<0.157.0>) Running os_mon on the same host as the controller, use the same beam
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    alarm_handler: {set,{system_memory_high_watermark,[]}}
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+              ts_mon:(5:<0.136.0>) Activate clients with json backend
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+              ts_mon:(5:<0.136.0>) Starting tsung clients on hosts: [localhost]
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(5:<0.135.0>) Start a launcher on the controller beam localhost
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    alarm_handler: {set,{{disk_almost_full,"/usr/lib/wsl/drivers"},[]}}
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    alarm_handler: {set,
+                       {{disk_almost_full,"/mnt/wsl/docker-desktop/cli-tools"},
+                        []}}
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+              ts_mon:(6:<0.136.0>) dump file opened, starting monitor
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+              ts_sup:(6:<0.182.0>) starting supervisor ...
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+              ts_sup:(6:<0.183.0>) starting
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+          ts_ip_scan:(6:<0.184.0>) Starting 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+     ts_launcher_mgr:(6:<0.185.0>) starting
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_session_cache:(6:<0.183.0>) Starting
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+        ts_mon_cache:(6:<0.183.0>) Starting
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+        ts_local_mon:(6:<0.183.0>) Starting
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+       ts_client_sup:(6:<0.190.0>) Starting 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+  ts_launcher_static:(6:<0.183.0>) starting 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+         ts_launcher:(6:<0.183.0>) starting 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(6:<0.135.0>) Application started, activate launcher, 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+  ts_launcher_static:(6:<0.135.0>) starting on node ['tsung_controller@Silviu-Lenovo']
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+         ts_launcher:(6:<0.135.0>) starting on node ['tsung_controller@Silviu-Lenovo']
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+  ts_launcher_static:(5:<0.191.0>) Launch msg receive ("localhost")
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(5:<0.135.0>) Set max duration of test: 60 s 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+         ts_launcher:(5:<0.192.0>) Launch msg receive ("localhost")
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+              ts_mon:(6:<0.136.0>) A launcher has started
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+     ts_launcher_mgr:(6:<0.185.0>) syncing already done, skip
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(5:<0.135.0>) Local file servers: None defined
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+  ts_launcher_static:(6:<0.191.0>) No static users, stop
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+  ts_launcher_static:(6:<0.191.0>) launcher terminating for reason normal
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+    ts_config_server:(5:<0.135.0>) New arrival phase 1 for client "localhost" (last ? true): will start 1 users
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+         ts_launcher:(5:<0.192.0>) Expected duration of first phase: 60.0 sec (1 users) 
+
+=INFO REPORT==== 7-Jan-2025::21:27:37 ===
+         ts_launcher:(5:<0.192.0>) Activate launcher (1 users) in 1129 msec 
+
+=INFO REPORT==== 7-Jan-2025::21:27:38 ===
+    ts_os_mon_erlang:(6:<0.157.0>) Spawn monitoring process on localhost (<0.193.0>)
+
+=INFO REPORT==== 7-Jan-2025::21:27:38 ===
+    ts_config_server:(6:<0.135.0>) Session 1 chosen
+
+=INFO REPORT==== 7-Jan-2025::21:27:38 ===
+         ts_launcher:(5:<0.192.0>) This was the last phase, wait for connected users to finish their session
+
+=INFO REPORT==== 7-Jan-2025::21:27:38 ===
+         ts_launcher:(6:<0.192.0>) launcher terminating for reason normal
+
+=INFO REPORT==== 7-Jan-2025::21:27:38 ===
+     ts_launcher_mgr:(6:<0.185.0>) All launchers are done on node 'tsung_controller@Silviu-Lenovo', wait for active clients to finish
+
+=INFO REPORT==== 7-Jan-2025::21:28:38 ===
+    ts_config_server:(0:<0.135.0>) Tsung test max duration reached, exits ! 
+
+=INFO REPORT==== 7-Jan-2025::21:28:38 ===
+              ts_mon:(0:<0.136.0>) Aborting by request !
+
+=INFO REPORT==== 7-Jan-2025::21:28:38 ===
+              ts_mon:(5:<0.136.0>) stopping monitor (abort)

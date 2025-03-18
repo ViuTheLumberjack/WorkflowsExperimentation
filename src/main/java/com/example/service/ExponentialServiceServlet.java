@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @WebServlet("/service/exponential")
 public class ExponentialServiceServlet extends HttpServlet {
@@ -16,6 +17,7 @@ public class ExponentialServiceServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Random random = new Random();
 
+    @WithSpan
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String paramLambda = request.getParameter("lambda");

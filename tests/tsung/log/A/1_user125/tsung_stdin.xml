@@ -1,0 +1,30 @@
+<?xml version="1.0"?><tsung loglevel="info" dumptraffic="protocol" version="1.0" backend="json">
+  <information>
+    <name> Test Service A </name>
+    <description> Test del singolo servizio A </description>
+  </information>
+
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+
+  <servers>
+    <server host="localhost" port="8080" type="tcp"/>
+  </servers>
+
+  <load duration="1" unit="minute">
+    <arrivalphase phase="1" duration="1" unit="minute">
+      <users maxnumber="1" arrivalrate="40" unit="second"/>
+    </arrivalphase>
+  </load>
+
+  <sessions>
+    <session name="first" type="ts_http" probability="100">
+      <for var="i" from="1" to="2" incr="0">
+        <request>
+          <http url="http://localhost:8080/service/sum?n=10000000" method="GET" version="1.1"/>
+        </request>
+      </for>
+    </session>
+  </sessions>
+</tsung>

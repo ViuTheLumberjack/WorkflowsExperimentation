@@ -1,0 +1,48 @@
+2024-12-09 19:29:05,369 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2024-12-09 19:29:05,399 INFO o.a.j.JMeter: Loading user properties from: /jmeter/bin/user.properties
+2024-12-09 19:29:05,401 INFO o.a.j.JMeter: Loading system properties from: /jmeter/bin/system.properties
+2024-12-09 19:29:05,415 INFO o.a.j.JMeter: Copyright (c) 1998-2022 The Apache Software Foundation
+2024-12-09 19:29:05,415 INFO o.a.j.JMeter: Version 5.5
+2024-12-09 19:29:05,416 INFO o.a.j.JMeter: java.version=21.0.4
+2024-12-09 19:29:05,417 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2024-12-09 19:29:05,417 INFO o.a.j.JMeter: os.name=Linux
+2024-12-09 19:29:05,417 INFO o.a.j.JMeter: os.arch=amd64
+2024-12-09 19:29:05,418 INFO o.a.j.JMeter: os.version=5.15.167.4-microsoft-standard-WSL2
+2024-12-09 19:29:05,418 INFO o.a.j.JMeter: file.encoding=UTF-8
+2024-12-09 19:29:05,419 INFO o.a.j.JMeter: java.awt.headless=null
+2024-12-09 19:29:05,419 INFO o.a.j.JMeter: Max memory     =1073741824
+2024-12-09 19:29:05,420 INFO o.a.j.JMeter: Available Processors =12
+2024-12-09 19:29:05,436 INFO o.a.j.JMeter: Default Locale=English (EN)
+2024-12-09 19:29:05,437 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2024-12-09 19:29:05,438 INFO o.a.j.JMeter: JMeterHome=/jmeter
+2024-12-09 19:29:05,438 INFO o.a.j.JMeter: user.dir  =/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter
+2024-12-09 19:29:05,439 INFO o.a.j.JMeter: PWD       =/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter
+2024-12-09 19:29:05,440 INFO o.a.j.JMeter: IP: 127.0.1.1 Name: Silviu-Lenovo FullName: Silviu-Lenovo.
+2024-12-09 19:29:05,458 INFO o.a.j.JMeter: Loaded icon properties from org/apache/jmeter/images/icon.properties
+2024-12-09 19:29:05,958 INFO o.a.j.JMeterGuiLauncher: Setting LAF to: com.github.weisj.darklaf.DarkLaf:com.github.weisj.darklaf.theme.DarculaTheme
+2024-12-09 19:29:08,359 INFO o.j.r.JARSourceHTTP: Requesting https://jmeter-plugins.org/repo/?installID=linux-62c9ca93a9acc444dc47786e06b6a15a-gui
+2024-12-09 19:29:11,585 INFO o.j.r.PluginManager: Plugins Status: [bzm-parallel=0.12, jpgc-plugins-manager=1.10, jmeter-core=5.5, jmeter-ftp=5.5, jmeter-http=5.5, jmeter-jdbc=5.5, jmeter-jms=5.5, jmeter-junit=5.5, jmeter-java=5.5, jmeter-ldap=5.5, jmeter-mail=5.5, jmeter-mongodb=5.5, jmeter-native=5.5, jmeter-tcp=5.5, jmeter-components=5.5]
+2024-12-09 19:29:11,910 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2024-12-09 19:29:11,912 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2024-12-09 19:29:11,914 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2024-12-09 19:29:11,915 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2024-12-09 19:29:11,917 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
+2024-12-09 19:29:11,918 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
+2024-12-09 19:29:17,874 INFO o.a.j.s.FileServer: Default base='/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter'
+2024-12-09 19:29:17,877 INFO o.a.j.g.a.Load: Loading file: /mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations/test_AND.jmx
+2024-12-09 19:29:17,878 INFO o.a.j.s.FileServer: Set new base='/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations'
+2024-12-09 19:29:18,084 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2024-12-09 19:29:18,094 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2024-12-09 19:29:18,098 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2024-12-09 19:29:18,100 INFO o.a.j.s.SaveService: Loading file: /mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations/test_AND.jmx
+2024-12-09 19:29:18,367 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2024-12-09 19:29:18,368 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2024-12-09 19:29:18,420 INFO o.a.j.s.FileServer: Set new base='/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations'
+2024-12-09 19:29:22,918 INFO o.a.j.g.a.Load: Loading file: /mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations/test_service_A.jmx
+2024-12-09 19:29:22,919 INFO o.a.j.s.FileServer: Set new base='/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations'
+2024-12-09 19:29:22,919 INFO o.a.j.s.SaveService: Loading file: /mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations/test_service_A.jmx
+2024-12-09 19:29:23,045 INFO o.a.j.s.FileServer: Set new base='/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/jmeter/configurations'
+2024-12-09 20:04:06,940 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2024-12-09 20:04:06,942 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to ISO-8859-1
+2024-12-09 20:04:06,943 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2024-12-09 20:04:06,943 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000

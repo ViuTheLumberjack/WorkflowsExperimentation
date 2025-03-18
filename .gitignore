@@ -1,0 +1,6 @@
+.idea
+target
+tests/__pycache__/
+tests/env/
+tests/k6/*/load
+tests/k6/*/performance

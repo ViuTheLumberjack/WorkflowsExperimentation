@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/mnt/s/Projects/qesm/tsung/tsung-1.0.dtd">
+<tsung loglevel="info" dumptraffic="protocol" version="1.0" backend="json">
+  <information>
+    <name> Test AND </name>
+    <description> Test di due servizi concorrenti </description>
+  </information>
+
+  <clients>
+    <client host="localhost" use_controller_vm="true" />
+  </clients>
+
+  <servers>
+    <server host="localhost" port="8080" type="tcp" />
+    <server host="localhost" port="8081" type="tcp" />
+  </servers>
+
+  <load duration="60" unit="second">
+    <!-- How much time does the test last -->
+    <arrivalphase duration="60" phase="1" unit="second">
+      <users maxnumber="%%NUM_REQUESTS%%" arrivalrate="40" unit="second" />
+    </arrivalphase>
+  </load>
+
+  <sessions>
+    <session name="first" type="ts_http" probability="100">
+      <for var="i" from="1" to="2" incr="0">
+        <transaction name="A_B">
+          <request>
+            <http url="http://localhost:8080/service/sum?n=10000000" method="GET" version="1.1" />
+          </request>
+          <request>
+            <http url="http://localhost:8081/service/sum?n=20000000" method="GET" version="1.1" />
+          </request>
+        </transaction>
+      </for>
+    </session>
+  </sessions>
+</tsung>
