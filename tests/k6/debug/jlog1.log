@@ -1,0 +1,58 @@
+2025-03-21 10:40:10,215 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2025-03-21 10:40:10,285 INFO o.a.j.JMeter: Loading user properties from: /jmeter/bin/user.properties
+2025-03-21 10:40:10,287 INFO o.a.j.JMeter: Loading system properties from: /jmeter/bin/system.properties
+2025-03-21 10:40:10,307 INFO o.a.j.JMeter: Copyright (c) 1998-2022 The Apache Software Foundation
+2025-03-21 10:40:10,308 INFO o.a.j.JMeter: Version 5.5
+2025-03-21 10:40:10,312 INFO o.a.j.JMeter: java.version=21.0.5
+2025-03-21 10:40:10,314 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2025-03-21 10:40:10,315 INFO o.a.j.JMeter: os.name=Linux
+2025-03-21 10:40:10,316 INFO o.a.j.JMeter: os.arch=amd64
+2025-03-21 10:40:10,317 INFO o.a.j.JMeter: os.version=5.15.167.4-microsoft-standard-WSL2
+2025-03-21 10:40:10,318 INFO o.a.j.JMeter: file.encoding=UTF-8
+2025-03-21 10:40:10,320 INFO o.a.j.JMeter: java.awt.headless=true
+2025-03-21 10:40:10,322 INFO o.a.j.JMeter: Max memory     =1073741824
+2025-03-21 10:40:10,323 INFO o.a.j.JMeter: Available Processors =12
+2025-03-21 10:40:10,345 INFO o.a.j.JMeter: Default Locale=English (EN)
+2025-03-21 10:40:10,347 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2025-03-21 10:40:10,348 INFO o.a.j.JMeter: JMeterHome=/jmeter
+2025-03-21 10:40:10,349 INFO o.a.j.JMeter: user.dir  =/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/k6/debug
+2025-03-21 10:40:10,350 INFO o.a.j.JMeter: PWD       =/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/k6/debug
+2025-03-21 10:40:10,351 INFO o.a.j.JMeter: IP: 127.0.1.1 Name: Silviu-Lenovo FullName: Silviu-Lenovo.
+2025-03-21 10:40:10,390 INFO o.a.j.s.FileServer: Default base='/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/k6/debug'
+2025-03-21 10:40:10,395 INFO o.a.j.s.FileServer: Set new base='/mnt/s/Projects/qesm/docker-workflows-experimentation/tests/k6/debug'
+2025-03-21 10:40:11,152 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2025-03-21 10:40:11,311 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2025-03-21 10:40:11,344 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2025-03-21 10:40:11,371 INFO o.a.j.s.SaveService: Loading file: test1usr.jmx
+2025-03-21 10:40:11,529 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2025-03-21 10:40:11,530 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2025-03-21 10:40:11,531 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2025-03-21 10:40:11,533 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2025-03-21 10:40:11,534 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
+2025-03-21 10:40:11,535 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
+2025-03-21 10:40:11,562 INFO o.a.j.JMeter: Creating summariser <summary>
+2025-03-21 10:40:11,636 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2025-03-21 10:40:11,641 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2025-03-21 10:40:11,642 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2025-03-21 10:40:11,676 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2025-03-21 10:40:11,678 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2025-03-21 10:40:12,007 INFO o.a.j.JMeter: Running test (1742550012007)
+2025-03-21 10:40:12,072 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Thread Group
+2025-03-21 10:40:12,073 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Thread Group.
+2025-03-21 10:40:12,075 INFO o.a.j.e.StandardJMeterEngine: Test will stop abruptly on error
+2025-03-21 10:40:12,077 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=1 ramp-up=0 delayedStart=false
+2025-03-21 10:40:12,092 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2025-03-21 10:40:12,093 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2025-03-21 10:40:12,099 INFO o.a.j.t.JMeterThread: Thread started: Thread Group 1-1
+2025-03-21 10:40:12,226 INFO o.a.j.p.h.s.HTTPHCAbstractImpl: Local host = Silviu-Lenovo
+2025-03-21 10:40:12,282 INFO o.a.j.p.h.s.HTTPHC4Impl: HTTP request retry count = 0
+2025-03-21 10:40:12,291 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2025-03-21 10:40:12,293 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to ISO-8859-1
+2025-03-21 10:40:12,299 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2025-03-21 10:40:12,303 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2025-03-21 10:40:30,007 INFO o.a.j.r.Summariser: summary +   3992 in 00:00:18 =  221.9/s Avg:     3 Min:     1 Max:    77 Err:     0 (0.00%) Active: 1 Started: 1 Finished: 0
+2025-03-21 10:40:42,080 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: Thread Group 1-1
+2025-03-21 10:40:42,087 INFO o.a.j.t.JMeterThread: Thread finished: Thread Group 1-1
+2025-03-21 10:40:42,099 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2025-03-21 10:40:42,106 INFO o.a.j.r.Summariser: summary +   3337 in 00:00:12 =  275.7/s Avg:     3 Min:     1 Max:    26 Err:     0 (0.00%) Active: 0 Started: 1 Finished: 1
+2025-03-21 10:40:42,108 INFO o.a.j.r.Summariser: summary =   7329 in 00:00:30 =  243.5/s Avg:     3 Min:     1 Max:    77 Err:     0 (0.00%)

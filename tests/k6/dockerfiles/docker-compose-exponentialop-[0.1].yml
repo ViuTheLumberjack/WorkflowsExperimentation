@@ -1,7 +1,7 @@
 services:
   service_0:
     container_name: exponentialop_0
-    cpuset: '0'
+    cpuset: '1'
     deploy:
       resources:
         limits:

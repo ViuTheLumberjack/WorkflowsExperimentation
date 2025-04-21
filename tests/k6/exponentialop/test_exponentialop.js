@@ -1,6 +1,5 @@
 // Import the http module to make HTTP requests. From this point, you can use `http` methods to make HTTP requests.
 import http from 'k6/http';
-import tempo from 'https://jslib.k6.io/http-instrumentation-tempo/1.0.0/index.js';
 
 export const options = {
     summaryTimeUnit: 's',
@@ -8,26 +7,19 @@ export const options = {
         average_time: {
             executor: 'constant-arrival-rate',
             rate: __ENV.RATE,
-            duration: '90s',
-            preAllocatedVUs: 4000
+            duration: '120s',
+            preAllocatedVUs: 2000,
+            gracefulStop: '60s',
         }
     },
 };
 
 const API_URL = `http://localhost:8080/service/exponentialop?max=` + __ENV.PARAM;
-const instrumentedHTTP = new tempo.Client({
-    propagator: 'w3c',
-});
+
 
 export default function () {
     // Make a GET request to the target URL
-    // http.get(API_URL);
-
-    let res = instrumentedHTTP.request('GET', API_URL, null, {
-        headers: {
-            'X-Example-Header': 'instrumented/request',
-        },
-    });
+    http.get(API_URL);
 }
 
 export function handleSummary(data) {

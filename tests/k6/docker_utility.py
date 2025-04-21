@@ -3,6 +3,7 @@ import io
 import yaml
 import subprocess
 import time
+import math
 from utility import TEST_SERVICE
 
 DOCKER_COMPOSE_FILE_FOLDER = os.path.join(os.path.dirname(__file__), "dockerfiles")
@@ -44,13 +45,14 @@ def create_containers(cpu_list: list, n: int = 1):
 
     num_services = service_containers[TEST_SERVICE]
 
-
     for i in range(num_services):
         service = SERVICE_TEMPLATE.copy()
 
+        cpus = [str(cpu) for cpu in range(cpu_list[i])] if cpu_list[i] >= 1 else [str(int(math.ceil(cpu_list[i])))]
+
         service["container_name"] = f"{TEST_SERVICE}_{i}"
         service["ports"] = [f"{8080 + i}:8080"]
-        service["cpuset"] = f"{i}"
+        service["cpuset"] = ','.join(cpus)
         service["deploy"]["resources"]["limits"]["cpus"] = f"{cpu_list[i]}"
 
         docker_file_dict["services"][f"service_{i}"] = service

@@ -1,5 +1,7 @@
 package com.example.service;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 @WebServlet("/service/exponentialop")
 public class ExponentialOperationServiceServlet extends HttpServlet {
@@ -17,12 +19,13 @@ public class ExponentialOperationServiceServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Random random = new Random();
 
+    @WithSpan
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String maxParameter = request.getParameter("max");
         if (maxParameter == null || maxParameter.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("Parameter 'lambda' is required");
+            response.getWriter().write("Parameter 'max' is required");
             return;
         }
 
@@ -34,14 +37,16 @@ public class ExponentialOperationServiceServlet extends HttpServlet {
         }
 
         // Generate a random delay following an exponential distribution with the given lambda
-        double delay = - Math.log(random.nextDouble()) / max;
-
+        double delay = (- Math.log(random.nextDouble())) * max;
+        
         // Busy wait for the generated delay.
         long startTime = System.currentTimeMillis();
+
         double sum = 0;
         for (int i = 0; i < delay; i++){
-            sum += sqrt(2);
+            sum += sqrt(delay);
         }
+
         long endTime = System.currentTimeMillis();
 
         // Format the date.

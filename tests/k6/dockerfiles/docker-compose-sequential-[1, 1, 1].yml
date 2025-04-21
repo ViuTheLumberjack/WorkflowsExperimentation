@@ -1,0 +1,82 @@
+services:
+  jaeger:
+    image: jaegertracing/jaeger:2.5.0
+    container_name: jaeger
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "5779:5779"
+      - "14268:14268"
+      - "14250:14250"
+      - "14267:14267"
+      - "4317:4317"
+      - "4318:4318"
+
+  service_0:
+    container_name: exponentialop_0
+    cpuset: '0'
+    environment:
+      - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
+      - OTEL_SERVICE_NAME=exponentialop_0
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    image: jboss/wildfly:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - ../../../opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+
+  service_1:
+    container_name: exponentialop_1
+    cpuset: '1'
+    environment:
+      - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
+      - OTEL_SERVICE_NAME=exponentialop_1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    image: jboss/wildfly:latest
+    ports:
+      - 8081:8080
+    volumes:
+      - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - ../../../opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+
+  service_2:
+    container_name: exponentialop_2
+    cpuset: '2'
+    environment:
+      - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
+      - OTEL_SERVICE_NAME=exponentialop_2
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    image: jboss/wildfly:latest
+    ports:
+      - 8082:8080
+    volumes:
+      - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - ../../../opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar

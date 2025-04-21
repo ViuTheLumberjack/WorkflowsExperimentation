@@ -1,5 +1,7 @@
 package com.example.service;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -16,6 +18,7 @@ import java.io.BufferedReader;
 public class SequentialServiceServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    @WithSpan
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String paramN1 = request.getParameter("n1");
@@ -29,10 +32,12 @@ public class SequentialServiceServlet extends HttpServlet {
 
         try {
             // First service.
-            String response1 = sendGetRequest("http://192.168.0.12:8081/service/sum?n=" + paramN1);
+            System.out.println("FIRST " + paramN1);
+            String response1 = sendGetRequest("http://exponentialop_1:8080/service/exponentialop?max=" + paramN1);
 
+            System.out.println("SECOND " + paramN2);
             // Second service.
-            String response2 = sendGetRequest("http://192.168.0.12:8082/service/sum?n=" + paramN2);
+            String response2 = sendGetRequest("http://exponentialop_2:8080/service/exponentialop?max=" + paramN2);
 
             /// Set response.
             System.out.println(response1);
@@ -52,6 +57,7 @@ public class SequentialServiceServlet extends HttpServlet {
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
+        conn.connect();
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             String inputLine;
