@@ -1,11 +1,12 @@
-import tempo from '../http-instrumentation-tempo.js';
+import tempo from './http-instrumentation-tempo.js';
+// import tempo from 'https://jslib.k6.io/http-instrumentation-tempo/1.0.0/index.js';
 
 export const options = {
     summaryTimeUnit: 'ms',
     scenarios: {
         average_time: {
             executor: 'constant-vus',
-            vus: 2,
+            vus: __ENV.CONCURRENT_USERS,
             duration: '30s'
         }
     },
@@ -15,7 +16,7 @@ const instrumentedHTTP = new tempo.Client({
     propagator: 'w3c',
 });
 
-const API_URL = `http://localhost:8080/service/sequential?e1=service_0&s1=exponentialop&n1=max&a1=` + 75000000 + `1&e2=service_1&s2=exponentialop&n2=max&a2=` + 75000000
+const API_URL = `http://localhost:8080/service/` + __ENV.PARAM;
 
 export default function () {
     // Make a GET request to the target URL
@@ -24,4 +25,12 @@ export default function () {
             'X-Example-Header': 'instrumented/request',
         }
     });
+}
+
+export function handleSummary(data) {
+    const title = `${__ENV.OUTPUT_PATH}/${__ENV.OUTPUT_NAME}`;
+    var obj = {}
+    obj[title] = JSON.stringify(data);
+
+    return obj;
 }

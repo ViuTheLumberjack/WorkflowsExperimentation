@@ -14,15 +14,15 @@ services:
       - 14267:14267
       - 4317:4317
       - 4318:4318
-  exponentialop_0:
+  sequential_0:
     image: jboss/wildfly:latest
-    container_name: exponentialop_0
+    container_name: sequential_0
     ports:
       - 8080:8080
     cpuset: '0'
     environment:
       - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
-      - OTEL_SERVICE_NAME=exponentialop_0
+      - OTEL_SERVICE_NAME=sequential_0
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_LOGS_EXPORTER=none
@@ -31,6 +31,27 @@ services:
       resources:
         limits:
           cpus: '1'
+          memory: 1024M
+    volumes:
+      - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - ../../../opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+  sequential_1:
+    image: jboss/wildfly:latest
+    container_name: sequential_1
+    ports:
+      - 8081:8080
+    cpuset: 1,2
+    environment:
+      - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
+      - OTEL_SERVICE_NAME=sequential_1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
           memory: 1024M
     volumes:
       - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war

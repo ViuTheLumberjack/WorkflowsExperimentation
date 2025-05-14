@@ -1,49 +1,96 @@
 import os
+import time
 import subprocess
-import pandas as pd
-import numpy as np
-from utility import CLOSED_LOOP_EXPERIMENTS, OPEN_LOOP_EXPERIMENTS, OPEN_LOOP_PATH, CLOSED_LOOP_PATH, RESULT_FOLDER
+from utility import WORKFLOW, CLOSED_LOOP_EXPERIMENTS, OPEN_LOOP_EXPERIMENTS, OPEN_LOOP_PATH, CLOSED_LOOP_PATH, RESULT_FOLDER, get_s
 #from utility import load_results, plot_results, plot_results_core, plot_results_mu, plot_job_sizes
-from docker_utility import create_containers, stop_containers
+from workflow_parser import get_workflow
+from docker_utility import SERVICES, create_containers, stop_containers
 
-def run_closed_loop_test(mu: int, num_cores: float, concurrent_users: int,  iteration: int):
-    OUTPUT_FOLDER = os.path.join(RESULT_FOLDER, "performance", f"{num_cores}_core", str(mu), f"{str(concurrent_users)}_users", str(iteration))
+WORK_DIR = os.path.join(os.path.dirname(__file__), "work_dir")
+
+def download_results(output_folder: str, start: int, end:int) -> None:
+    # Download the results from the Jaeger UI
+    if len(SERVICES) == 1:
+        return
+    
+    start = start // 1000
+    end = end // 1000
+    
+    jaeger_url = f"http://localhost:16686/api/traces?service={{SERVICE_NAME}}&lookback=custom&start={start}&end={end}"
+
+    # only one iteration because w3c trace context is the same for all the services supported
+    for service in SERVICES:
+        jaeger_service_url = jaeger_url.replace("{SERVICE_NAME}", service)
+
+        response = subprocess.run(['curl', '-X', 'GET', jaeger_service_url], capture_output=True)
+        if response.returncode == 0:
+            with open(os.path.join(output_folder, f'jaeger.json'), 'wb') as f:
+                f.write(response.stdout)
+        
+        break
+
+def move_to(source: str, dest: str) -> None:
+    """
+    Move the file from source to destination
+    """
+    if os.path.exists(source):
+        subprocess.run(['mv', source, dest])
+
+def run_closed_loop_test(mu: list, num_cores: list, concurrent_users: int,  iteration: int):
+    OUTPUT_FOLDER = os.path.join(RESULT_FOLDER, "performance", f"{get_s(num_cores)}_core", str(get_s(mu)), f"{str(concurrent_users)}_users", str(iteration))
     os.makedirs(os.path.join(OUTPUT_FOLDER), exist_ok=True)
 
     env = os.environ.copy()
     env.clear()
     env["CONCURRENT_USERS"] = str(concurrent_users)
-    env["PARAM"] = str(mu)
-    env["OUTPUT_PATH"] = os.path.join(OUTPUT_FOLDER)
+    env["PARAM"] = get_workflow(WORKFLOW, mu)
+    env["OUTPUT_PATH"] = os.path.join(WORK_DIR)
+    env["OUTPUT_NAME"] = f"metrics.json"
     env["K6_WEB_DASHBOARD"] = "true"
-    env["K6_WEB_DASHBOARD_EXPORT"] = os.path.join(OUTPUT_FOLDER, f"{mu}_report.html")
+    env["K6_WEB_DASHBOARD_EXPORT"] = os.path.join(WORK_DIR, f"report.html")
     env["K6_WEB_DASHBOARD_PERIOD"] = "1s"
+
+    start = time.time_ns()
     subprocess.run(['k6', 'run', CLOSED_LOOP_PATH], env=env)
+    end = time.time_ns()
 
     print(f"Test {mu} {num_cores} {concurrent_users} {iteration} completed.")
+    move_to(os.path.join(WORK_DIR, "metrics.json"), os.path.join(OUTPUT_FOLDER, "metrics.json"))
+    move_to(os.path.join(WORK_DIR, "report.html"), os.path.join(OUTPUT_FOLDER, "report.html"))
+    download_results(OUTPUT_FOLDER, start, end)
 
-def run_open_loop_test(mu: int, l: int, num_cores: int, iteration: int):
-    OUTPUT_FOLDER = os.path.join(RESULT_FOLDER, "load", f"{num_cores}_core", str(mu), str(l), str(iteration))
+def run_open_loop_test(mu: list, l: int, num_cores: list, iteration: int):
+    OUTPUT_FOLDER = os.path.join(RESULT_FOLDER, "load", f"{get_s(num_cores)}_core", str(get_s(mu)), str(l), str(iteration))
     os.makedirs(os.path.join(OUTPUT_FOLDER), exist_ok=True)
 
     env = os.environ.copy()
     env.clear()
     env["RATE"] = str(l)
-    env["PARAM"] = str(mu)
-    env["OUTPUT_PATH"] = os.path.join(OUTPUT_FOLDER)
+    env["PARAM"] = get_workflow(WORKFLOW, mu)
+    env["OUTPUT_PATH"] = os.path.join(WORK_DIR)
+    env["OUTPUT_NAME"] = f"metrics.json"
 
-    csv_file = os.path.join(OUTPUT_FOLDER, f"{l}_{mu}_report.csv")
+    csv_file = os.path.join(WORK_DIR, f"report.csv")
     env["K6_OUT"] = f"csv={csv_file}"
     env["K6_WEB_DASHBOARD"] = "true"
-    env["K6_WEB_DASHBOARD_EXPORT"] = os.path.join(OUTPUT_FOLDER, f"{l}_{mu}_report.html")
+    env["K6_WEB_DASHBOARD_EXPORT"] = os.path.join(WORK_DIR, f"report.html")
     env["K6_WEB_DASHBOARD_PERIOD"] = "1s"
+
+    start = time.time_ns()
     subprocess.run(['k6', 'run', OPEN_LOOP_PATH], env=env)
+    end = time.time_ns()
 
     print(f"Test {mu} {l} {num_cores} {iteration} completed.")
+    move_to(os.path.join(WORK_DIR, "metrics.json"), os.path.join(OUTPUT_FOLDER, "metrics.json"))
+    move_to(os.path.join(WORK_DIR, "report.csv"), os.path.join(OUTPUT_FOLDER, "report.csv"))
+    move_to(os.path.join(WORK_DIR, "report.html"), os.path.join(OUTPUT_FOLDER, "report.html"))
+    download_results(OUTPUT_FOLDER, start, end)
 
 if __name__ == '__main__':
-    CLOSED_LOOP = True
-    OPEN_LOOP = False
+    CLOSED_LOOP = False
+    OPEN_LOOP = True
+
+    os.makedirs(WORK_DIR, exist_ok=True)
 
     if CLOSED_LOOP:
         for key, value in CLOSED_LOOP_EXPERIMENTS.items():
@@ -55,7 +102,7 @@ if __name__ == '__main__':
             USERs = value["USERs"]
 
             for core in NUM_CORES:
-                create_containers([core], core)
+                create_containers(core)
                 for mu in MUs:
                     for users in USERs:
                         for i in range(START, TESTS):
@@ -72,23 +119,10 @@ if __name__ == '__main__':
             LAMBDAs = value["LAMBDAs"]
 
             for core in NUM_COREs:
-                create_containers([core], core)
+                create_containers(core)
                 for mu in MUs:
                     for l in LAMBDAs:
                         for i in range(START, TESTS):
                             run_open_loop_test(mu=mu, l=l, num_cores=core, iteration=i)
                 
                 stop_containers(delete_containers=True)
-
-#    df = load_results(LAMBDAs=LAMBDAs, MUs=MUs, NUM_CORES=NUM_COREs)
-#    plot_job_sizes(df)
-#
-#    for mu in MUs:
-#        for nc in NUM_COREs:
-#            plot_results_mu(df, nc)
-#            plot_results(df[np.logical_and(df['mu'] == mu, df['cores'] == nc)], mu, nc)
-#        
-#        plot_results_core(df, mu)
-
-#    df.to_csv(os.path.join(RESULT_FOLDER, 'data.csv'), index=False)
-#    print('All tests completed.')

@@ -5,14 +5,17 @@ import json
 from math import pow,factorial,log,exp
 from matplotlib import pyplot as plt, colors
 
-
 TEST_SERVICE = 'exponentialop'
 
 RESULT_FOLDER = os.path.join(os.path.dirname(__file__), TEST_SERVICE)
-OPEN_LOOP_PATH = os.path.join(RESULT_FOLDER, f'test_{TEST_SERVICE}.js')
-CLOSED_LOOP_PATH = os.path.join(RESULT_FOLDER, f'performance_{TEST_SERVICE}.js')
+
+TEST_PATH = os.path.join(os.path.dirname(__file__))
+OPEN_LOOP_PATH = os.path.join(TEST_PATH, f'test_load.js')
+CLOSED_LOOP_PATH = os.path.join(TEST_PATH, f'test_performance.js')
 
 configuration = json.load(open(os.path.join(RESULT_FOLDER, 'experiments.json')))
+
+WORKFLOW = configuration["workflow"] if "workflow" in configuration else None
 
 CLOSED_LOOP_EXPERIMENTS = { 
     "HIGH_RESOURCES": {
@@ -40,6 +43,12 @@ OPEN_LOOP_EXPERIMENTS = {
         "MUs": configuration["open_loop_experiments"]["high_load_experiment"]["mus"],
     },
 }
+
+def get_s(l: list) -> str:
+    """
+    Returns a string from a list of strings
+    """
+    return "[" + ','.join([str(i) for i in l]) + "]"
 
 def PowerFact(b,e):
     """
@@ -73,8 +82,8 @@ def find_steady_state_start(diff_series, window=5, epsilon=0.5):
             return i - window  # Index where steady state starts
     return None
 
-def load_single_load_results(num_cores: float, mu: int, l: int, iteration: int) -> pd.DataFrame:
-    file_path = os.path.join(RESULT_FOLDER, "load", f"{num_cores}_core", str(mu), str(l), str(iteration), f"{l}_{mu}_report.csv")
+def load_single_load_results(num_cores: list, mu: int, l: int, iteration: int) -> pd.DataFrame:
+    file_path = os.path.join(RESULT_FOLDER, "load", f"{get_s(num_cores)}_core", str(get_s(mu)), str(l), str(iteration), f"report.csv")
     new_df = pd.read_csv(file_path)
     new_df = new_df[new_df['metric_name'].isin(["vus", "http_req_duration"])]
     
@@ -87,6 +96,7 @@ def load_single_load_results(num_cores: float, mu: int, l: int, iteration: int) 
         initial_timestamp = new_df.loc[differences.index[steady_start]]['timestamp']
         steady_df = new_df[new_df['timestamp'] >= initial_timestamp]
     else:
+        # TODO: handle the case when steady state is not found
         steady_df = new_df
 
     # compute run statistics, so mean time values and mean vus
@@ -120,7 +130,7 @@ def load_load_results() -> pd.DataFrame:
     return df
 
 def load_single_performance_results(num_cores: float, mu: int, concurrent_users: int, iteration: int) -> pd.DataFrame:
-    file_path = os.path.join(RESULT_FOLDER, "performance", f"{num_cores}_core", str(mu), f"{str(concurrent_users)}_users", str(iteration), f"performance_{mu}_metrics.json")
+    file_path = os.path.join(RESULT_FOLDER, "performance", f"{get_s(num_cores)}_core", str(get_s(mu)), f"{str(concurrent_users)}_users", str(iteration), f"metrics.json")
     with open(file_path) as train_file:
         dict = json.load(train_file)
         dict['metrics']['mu'] = mu

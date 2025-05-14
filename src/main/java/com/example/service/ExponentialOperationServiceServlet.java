@@ -7,9 +7,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
 
 import static java.lang.Math.*;
 
@@ -17,7 +14,7 @@ import static java.lang.Math.*;
 public class ExponentialOperationServiceServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private Random random = new Random();
+    private DummyServiceRepository dsr = new DummyServiceRepository();
 
     @WithSpan
     @Override
@@ -29,36 +26,16 @@ public class ExponentialOperationServiceServlet extends HttpServlet {
             return;
         }
 
-        double max = Double.parseDouble(maxParameter);
+        int max = Integer.parseInt(maxParameter);
         if (max <= 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Invalid exponential distribution parameter");
             return;
         }
 
-        // Generate a random delay following an exponential distribution with the given lambda
-        double delay = (- Math.log(random.nextDouble())) * max;
-        
-        // Busy wait for the generated delay.
-        long startTime = System.currentTimeMillis();
-
-        double sum = 0;
-        for (int i = 0; i < delay; i++){
-            sum += sqrt(delay);
-        }
-
-        long endTime = System.currentTimeMillis();
-
-        // Format the date.
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
-
-        // Return the result.
         response.setContentType("text/plain");
         response.getWriter().write(
-            "Exponential Distribution Delay: " + delay + " ms\n" +
-            "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
-            "Elapsed time: " + (endTime - startTime) + " ms\n" +
-            "End time: " + sdf.format(new Date(endTime)) + "ms"
+            dsr.doExponentialOperation(max)
         );
     }
 }
