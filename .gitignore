@@ -6,3 +6,4 @@ tests/k6/*/performance
 node_modules/
 tests/__pycache__/
 tests/k6/__pycache__/
+tests/k6/downloads/

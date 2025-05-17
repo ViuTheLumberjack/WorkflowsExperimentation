@@ -5,7 +5,7 @@ import json
 from math import pow,factorial,log,exp
 from matplotlib import pyplot as plt, colors
 
-TEST_SERVICE = 'exponentialop'
+TEST_SERVICE = os.path.join('exponentialop')
 
 RESULT_FOLDER = os.path.join(os.path.dirname(__file__), TEST_SERVICE)
 
@@ -82,39 +82,43 @@ def find_steady_state_start(diff_series, window=5, epsilon=0.5):
             return i - window  # Index where steady state starts
     return None
 
-def load_single_load_results(num_cores: list, mu: int, l: int, iteration: int) -> pd.DataFrame:
-    file_path = os.path.join(RESULT_FOLDER, "load", f"{get_s(num_cores)}_core", str(get_s(mu)), str(l), str(iteration), f"report.csv")
-    new_df = pd.read_csv(file_path)
-    new_df = new_df[new_df['metric_name'].isin(["vus", "http_req_duration"])]
-    
-    # get only the data at steady state
-    # we are at steady state when difference between subsequent is similar
-    differences = new_df[new_df['metric_name'] == 'vus']['metric_value'].diff()
+def load_single_load_results(num_cores: list, mu: list, l: int, iteration: int) -> pd.DataFrame:
+    if len(num_cores) > 1:
+        # TODO: HANDLE THE CASE WHEN WE HAVE MORE THAN 1 SERVICE, HENCE WE ARE IN A WORKFLOW
+        pass
+    else :
+        file_path = os.path.join(RESULT_FOLDER, "load", f"{get_s(num_cores)}_core", str(get_s(mu)), str(l), str(iteration), f"report.csv")
+        new_df = pd.read_csv(file_path)
+        new_df = new_df[new_df['metric_name'].isin(["vus", "http_req_duration"])]
+        
+        # get only the data at steady state
+        # we are at steady state when difference between subsequent is similar
+        differences = new_df[new_df['metric_name'] == 'vus']['metric_value'].diff()
 
-    steady_start = find_steady_state_start(differences, window=10, epsilon=4)
-    if steady_start:
-        initial_timestamp = new_df.loc[differences.index[steady_start]]['timestamp']
-        steady_df = new_df[new_df['timestamp'] >= initial_timestamp]
-    else:
-        # TODO: handle the case when steady state is not found
-        steady_df = new_df
+        steady_start = find_steady_state_start(differences, window=10, epsilon=4)
+        if steady_start:
+            initial_timestamp = new_df.loc[differences.index[steady_start]]['timestamp']
+            steady_df = new_df[new_df['timestamp'] >= initial_timestamp]
+        else:
+            # TODO: handle the case when steady state is not found
+            steady_df = new_df
 
-    # compute run statistics, so mean time values and mean vus
-    stats_df = steady_df.groupby(['metric_name']).agg(
-        mean=('metric_value', 'mean'),
-        min=('metric_value', 'min'),
-        max=('metric_value', 'max'),
-        std=('metric_value', 'std'),
-        count=('metric_value', 'count'),
-        median=('metric_value', 'median')
-    ).reset_index()
+        # compute run statistics, so mean time values and mean vus
+        stats_df = steady_df.groupby(['metric_name']).agg(
+            mean=('metric_value', 'mean'),
+            min=('metric_value', 'min'),
+            max=('metric_value', 'max'),
+            std=('metric_value', 'std'),
+            count=('metric_value', 'count'),
+            median=('metric_value', 'median')
+        ).reset_index()
 
-    stats_df['mu'] = mu
-    stats_df['lambda'] = l
-    stats_df['cores'] = num_cores
-    stats_df['iteration'] = iteration
+        stats_df['mu'] = mu[0]
+        stats_df['lambda'] = l
+        stats_df['cores'] = num_cores[0]
+        stats_df['iteration'] = iteration
 
-    return stats_df
+        return stats_df
 
 def load_load_results() -> pd.DataFrame:
     # Load the results.
@@ -129,15 +133,19 @@ def load_load_results() -> pd.DataFrame:
 
     return df
 
-def load_single_performance_results(num_cores: float, mu: int, concurrent_users: int, iteration: int) -> pd.DataFrame:
-    file_path = os.path.join(RESULT_FOLDER, "performance", f"{get_s(num_cores)}_core", str(get_s(mu)), f"{str(concurrent_users)}_users", str(iteration), f"metrics.json")
-    with open(file_path) as train_file:
-        dict = json.load(train_file)
-        dict['metrics']['mu'] = mu
-        dict['metrics']['iteration'] = iteration
-        dict['metrics']['cores'] = num_cores
+def load_single_performance_results(num_cores: list, mu: list, concurrent_users: int, iteration: int) -> pd.DataFrame:
+    if len(num_cores) > 1:
+        # TODO: HANDLE THE CASE WHEN WE HAVE MORE THAN 1 SERVICE, HENCE WE ARE IN A WORKFLOW
+        pass
+    else :
+        file_path = os.path.join(RESULT_FOLDER, "performance", f"{get_s(num_cores)}_core", str(get_s(mu)), f"{str(concurrent_users)}_users", str(iteration), f"metrics.json")
+        with open(file_path) as train_file:
+            dict = json.load(train_file)
+            dict['metrics']['mu'] = mu[0]
+            dict['metrics']['iteration'] = iteration
+            dict['metrics']['cores'] = num_cores[0]
 
-        return pd.json_normalize(dict['metrics'])
+            return pd.json_normalize(dict['metrics'])
 
 def load_performance_results() -> pd.DataFrame:
     # Load the results.
@@ -181,45 +189,47 @@ def check_law(df_performance: pd.DataFrame = None, df_load: pd.DataFrame = None)
         os.makedirs(BASE_PLOT_FOLDER, exist_ok=True)
 
     # plot T as a function of L, comparing theoretical and real values for each load rate and each service rate and each core
-    for core in OPEN_LOOP_EXPERIMENTS['high_load_experiment']["NUM_COREs"]:
-        for mu in OPEN_LOOP_EXPERIMENTS["high_load_experiment"]["MUs"]:
-            load_df = df_load[np.logical_and(df_load['cores'] == core, df_load['mu'] == mu)]
-            load_df = load_df.groupby(['metric_name', 'lambda'], as_index=False).mean()
-            performance_df = job_sizes[np.logical_and(job_sizes['mu'] == mu, job_sizes['cores'] == core)]
-            
-            job_size = performance_df[performance_df['vus.values.value'] == 1]['job_size'].values[0]
-            
-            users = load_df.loc[load_df.metric_name=='vus'] 
-            times = load_df.loc[load_df.metric_name=='http_req_duration']
+    for cores in OPEN_LOOP_EXPERIMENTS['high_load_experiment']["NUM_COREs"]:
+        for mus in OPEN_LOOP_EXPERIMENTS["high_load_experiment"]["MUs"]:
+            for mu in mus:
+                for core in cores:
+                    load_df = df_load[np.logical_and(df_load['cores'] == core, df_load['mu'] == mu)]
+                    load_df = load_df.groupby(['metric_name', 'lambda'], as_index=False).mean()
+                    performance_df = job_sizes[np.logical_and(job_sizes['mu'] == mu, job_sizes['cores'] == core)]
+                    
+                    job_size = performance_df[performance_df['vus.values.value'] == 1]['job_size'].values[0]
+                    
+                    users = load_df.loc[load_df.metric_name=='vus'] 
+                    times = load_df.loc[load_df.metric_name=='http_req_duration']
 
-            lx = users[['lambda', 'mean']].copy()
-            # lx['count'] = times["count"].values
-            lx['mean'] = lx['mean'] * job_size / core
-            lx['mean'].mean()
-            times
-            # plot the results
-            plt.figure(figsize=(20, 12))
-            plt.plot(lx['lambda'], lx['mean'], marker='.', linestyle='-', markersize=10, label='Theoretical')
-            plt.plot(times['lambda'], times['mean'], marker='.', linestyle='-', markersize=10, label='Empirical')
-            
-            # Set the title and labels.
-            plt.title(f'Check law for mu = {mu} with R = {core} core ({TEST_SERVICE})')
-            plt.xlabel('Lambda')
-            plt.ylabel('Time')
+                    lx = users[['lambda', 'mean']].copy()
+                    # lx['count'] = times["count"].values
+                    lx['mean'] = lx['mean'] * job_size / core
+                    lx['mean'].mean()
+                    times
+                    # plot the results
+                    plt.figure(figsize=(20, 12))
+                    plt.plot(lx['lambda'], lx['mean'], marker='.', linestyle='-', markersize=10, label='Theoretical')
+                    plt.plot(times['lambda'], times['mean'], marker='.', linestyle='-', markersize=10, label='Empirical')
+                    
+                    # Set the title and labels.
+                    plt.title(f'Check law for mu = {mu} with R = {core} core ({TEST_SERVICE})')
+                    plt.xlabel('Lambda')
+                    plt.ylabel('Time')
 
-            # Show the grid and legend
-            plt.grid(True)
-            legend = plt.legend(loc='upper left')
-            for lh in legend.legend_handles:
-                lh.set_alpha(1)
+                    # Show the grid and legend
+                    plt.grid(True)
+                    legend = plt.legend(loc='upper left')
+                    for lh in legend.legend_handles:
+                        lh.set_alpha(1)
 
-            # Save the plot.
-            PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu))
-            if not os.path.exists(PLOT_FOLDER):
-                os.makedirs(PLOT_FOLDER, exist_ok=True)
-                
-            plt.savefig(os.path.join(PLOT_FOLDER, f'check_law_{mu}_{core}cores.png'))
-            plt.close()
+                    # Save the plot.
+                    PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu))
+                    if not os.path.exists(PLOT_FOLDER):
+                        os.makedirs(PLOT_FOLDER, exist_ok=True)
+                        
+                    plt.savefig(os.path.join(PLOT_FOLDER, f'check_law_{mu}_{core}cores.png'))
+                    plt.close()
 
 def _plot_job_size(core_df: pd.DataFrame, mu: int, user: int, PLOT_FOLDER: str) -> None:
     # Create the plot.
@@ -317,24 +327,26 @@ def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
     df_performance['job_size'] = df_performance['http_req_duration.values.avg'] * df_performance['cores'] / df_performance['vus_max.values.value']
     average = df_performance.groupby(['cores', 'mu', 'vus_max.values.value'], as_index=False).mean()
 
-    for mu in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
-        for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
-            core_df = average[np.logical_and(average['mu'] == mu, average['vus_max.values.value'] == user)]
+    for mus in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
+        for mu in mus:
+            for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
+                core_df = average[np.logical_and(average['mu'] == mu, average['vus_max.values.value'] == user)]
 
-            PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu), str(user))
-            if not os.path.exists(PLOT_FOLDER):
-                os.makedirs(PLOT_FOLDER, exist_ok=True)
+                PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu), str(user))
+                if not os.path.exists(PLOT_FOLDER):
+                    os.makedirs(PLOT_FOLDER, exist_ok=True)
 
-            _plot_job_size(core_df, mu, user, PLOT_FOLDER)
-            _plot_time(core_df, mu, user, PLOT_FOLDER)
+                _plot_job_size(core_df, mu, user, PLOT_FOLDER)
+                _plot_time(core_df, mu, user, PLOT_FOLDER)
 
-    for mu in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
-        # plot on the same plot the job size for each user
-        PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu))
+    for mus in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
+        for mu in mus:
+            # plot on the same plot the job size for each user
+            PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu))
 
-        ## plot the times
-        _plot_all_job_sizes(average, mu, PLOT_FOLDER)
-        _plot_all_times(average, mu, PLOT_FOLDER)
+            ## plot the times
+            _plot_all_job_sizes(average, mu, PLOT_FOLDER)
+            _plot_all_times(average, mu, PLOT_FOLDER)
 
     df_performance.to_csv(os.path.join(BASE_PLOT_FOLDER, 'data.csv'), index=False)
 
