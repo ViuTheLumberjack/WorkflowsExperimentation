@@ -82,7 +82,7 @@ def find_steady_state_start(diff_series, window=5, epsilon=0.5):
             return i - window  # Index where steady state starts
     return None
 
-def load_single_load_results(num_cores: list, mu: list, l: int, iteration: int) -> pd.DataFrame:
+def load_single_load_results(num_cores: list, mu: list, l: int, iteration: int) -> pd.DataFrame | None:
     if len(num_cores) > 1:
         # TODO: HANDLE THE CASE WHEN WE HAVE MORE THAN 1 SERVICE, HENCE WE ARE IN A WORKFLOW
         pass
@@ -133,7 +133,7 @@ def load_load_results() -> pd.DataFrame:
 
     return df
 
-def load_single_performance_results(num_cores: list, mu: list, concurrent_users: int, iteration: int) -> pd.DataFrame:
+def load_single_performance_results(num_cores: list, mu: list, concurrent_users: int, iteration: int) -> pd.DataFrame | None:
     if len(num_cores) > 1:
         # TODO: HANDLE THE CASE WHEN WE HAVE MORE THAN 1 SERVICE, HENCE WE ARE IN A WORKFLOW
         pass
@@ -252,7 +252,7 @@ def _plot_job_size(core_df: pd.DataFrame, mu: int, user: int, PLOT_FOLDER: str) 
     plt.savefig(os.path.join(PLOT_FOLDER, f'job_sizes.png'))
     plt.close()
 
-def _plot_time(core_df: pd.DataFrame, mu: int, user: int,PLOT_FOLDER: str) -> None:
+def _plot_time(core_df: pd.DataFrame, mu: int, user: int, PLOT_FOLDER: str) -> None:
     plt.figure(figsize=(20, 12))
     plt.plot(core_df['cores'], core_df['http_req_duration.values.avg'], marker='.', linestyle='-', markersize=10)
     # Set the title and labels.
@@ -265,7 +265,7 @@ def _plot_time(core_df: pd.DataFrame, mu: int, user: int,PLOT_FOLDER: str) -> No
     # Show the grid and legend
     plt.grid(True)
 
-    plt.savefig(os.path.join(PLOT_FOLDER, f'times.png'))
+    plt.savefig(os.path.join(PLOT_FOLDER, f'{mu}_times.png'))
     plt.close()
 
 def _plot_all_job_sizes(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> None:
@@ -285,7 +285,7 @@ def _plot_all_job_sizes(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> Non
     for lh in legend.legend_handles:
         lh.set_alpha(1)
 
-    plt.savefig(os.path.join(PLOT_FOLDER, f'times.png'))
+    plt.savefig(os.path.join(PLOT_FOLDER, f'{mu}_times.png'))
     plt.close()
 
 def _plot_all_times(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> None:
@@ -332,7 +332,7 @@ def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
             for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
                 core_df = average[np.logical_and(average['mu'] == mu, average['vus_max.values.value'] == user)]
 
-                PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu), str(user))
+                PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mu), str(user))
                 if not os.path.exists(PLOT_FOLDER):
                     os.makedirs(PLOT_FOLDER, exist_ok=True)
 
@@ -342,7 +342,7 @@ def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
     for mus in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
         for mu in mus:
             # plot on the same plot the job size for each user
-            PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu))
+            PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mu))
 
             ## plot the times
             _plot_all_job_sizes(average, mu, PLOT_FOLDER)
