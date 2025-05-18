@@ -328,11 +328,11 @@ def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
     average = df_performance.groupby(['cores', 'mu', 'vus_max.values.value'], as_index=False).mean()
 
     for mus in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
-        PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mus), str(user))
-        if not os.path.exists(PLOT_FOLDER):
-            os.makedirs(PLOT_FOLDER, exist_ok=True)
-        for mu in mus:
-            for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
+        for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
+            PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mus), str(user))
+            if not os.path.exists(PLOT_FOLDER):
+                os.makedirs(PLOT_FOLDER, exist_ok=True)
+            for mu in mus:
                 core_df = average[np.logical_and(average['mu'] == mu, average['vus_max.values.value'] == user)]
 
                 _plot_job_size(core_df, mu, user, PLOT_FOLDER)
