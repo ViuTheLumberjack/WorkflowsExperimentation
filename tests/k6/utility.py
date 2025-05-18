@@ -328,22 +328,20 @@ def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
     average = df_performance.groupby(['cores', 'mu', 'vus_max.values.value'], as_index=False).mean()
 
     for mus in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
+        PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mus), str(user))
+        if not os.path.exists(PLOT_FOLDER):
+            os.makedirs(PLOT_FOLDER, exist_ok=True)
         for mu in mus:
             for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
                 core_df = average[np.logical_and(average['mu'] == mu, average['vus_max.values.value'] == user)]
-
-                PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mu), str(user))
-                if not os.path.exists(PLOT_FOLDER):
-                    os.makedirs(PLOT_FOLDER, exist_ok=True)
 
                 _plot_job_size(core_df, mu, user, PLOT_FOLDER)
                 _plot_time(core_df, mu, user, PLOT_FOLDER)
 
     for mus in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["MUs"]:
+        # plot on the same plot the job size for each user
+        PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mus))
         for mu in mus:
-            # plot on the same plot the job size for each user
-            PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mu))
-
             ## plot the times
             _plot_all_job_sizes(average, mu, PLOT_FOLDER)
             _plot_all_times(average, mu, PLOT_FOLDER)
