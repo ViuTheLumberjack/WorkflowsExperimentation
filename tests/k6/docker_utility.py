@@ -34,13 +34,23 @@ SERVICE_TEMPLATE = {
         }
     },
     "volumes": [
-        "../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war",
-        "../../../opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar"
+        "$HOME$/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war",
+        "$HOME$/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar"
     ]
 }
 
 SERVICES = [
 ]
+
+def find_project_root(start_path: os.path, marker=".git"):
+    current = os.path.abspath(start_path)
+    while True:
+        if marker in os.listdir(current):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            raise FileNotFoundError(f"Marker '{marker}' not found.")
+        current = parent
 
 def create_docker_compose_file(cpu_list: list):
     docker_file_dict = {
@@ -67,12 +77,15 @@ def create_docker_compose_file(cpu_list: list):
 
     num_services = len(cpu_list)
     offset = 0
+    project_dir = find_project_root(os.path.dirname(__file__))
     
     for i in range(num_services):
         service = copy.deepcopy(SERVICE_TEMPLATE)
 
         cpus = [str(cpu + offset) for cpu in range(cpu_list[i])] if cpu_list[i] >= 1 else [str(int(math.ceil(cpu_list[i])))]
         offset += cpu_list[i]
+
+        service["volumes"] = [service["volumes"][i].replace("$HOME$", project_dir) for i in range(len(service["volumes"]))]
 
         service_name = f"{TEST_SERVICE}_{i}"
         SERVICES.append(service_name)
