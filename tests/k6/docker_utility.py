@@ -6,7 +6,7 @@ import subprocess
 import time
 import math
 from ruamel.yaml import YAML, representer
-from utility import TEST_SERVICE, WORKFLOW
+from utility import TEST_SERVICE
 
 DOCKER_COMPOSE_FILE_FOLDER = os.path.join(os.path.dirname(__file__), "dockerfiles")
 
@@ -137,5 +137,5 @@ def stop_containers(delete_containers: bool = True):
         subprocess.run(['docker', 'compose', 'stop'])
 
 if __name__ == "__main__":
-    cpu_list = [1, 1]
+    cpu_list = [1]
     create_docker_compose_file(cpu_list)

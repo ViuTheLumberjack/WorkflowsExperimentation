@@ -50,6 +50,30 @@ public class DummyServiceRepository {
     }
 
     @WithSpan
+    public String doAlternative(float probability, String endpoint1, String service1, String argument1, String paramN1, String endpoint2, String service2, String argument2, String paramN2) throws IOException {
+
+        double randVal = random.nextDouble();
+
+        String response;
+        int i = 0;
+
+        if (randVal < probability){
+            // First service.
+            i = 1;
+            response = sendGetRequest("http://" + endpoint1 + ":8080/service/" + service1 + "?" + paramN1 +"=" + argument1);
+        } else {
+            // Second service.
+            i = 2;
+            response = sendGetRequest("http://" + endpoint2 + ":8080/service/" + service2 + "?" + paramN2 +"=" + argument2);
+        }
+
+        /// Set response.
+        return ("Selected Service:" +
+                "\n\t- Service "+ i +" :\n\t\t" + response
+        );
+    }
+
+    @WithSpan
     public String doExponentialOperation(int max){
         // Generate a random delay following an exponential distribution with the given lambda
         double delay = (- Math.log(random.nextDouble())) * max;
