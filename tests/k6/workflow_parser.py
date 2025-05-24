@@ -31,7 +31,7 @@ def get_num_services(workflow: dict) -> int:
     return count
 
 def get_workflow(workflow: dict, args: list) -> list:
-    if workflow["type"] in ["sequential", "parallel", "choice"]:
+    if workflow["type"] in ["sequential", "parallel", "alternative"]:
         return get_simple_workflow_instance(workflow, args)
     elif workflow["type"] in ["exponentialop", "sum", "exponential"]:
         return get_simple_service_instance(workflow, args)
@@ -45,6 +45,7 @@ def get_simple_workflow_instance(workflow: list, args: list) -> str:
     """
     #in the workflow 
     wf_complete = {}
+    wf_complete[f"p"] = workflow["p"]
     for i in range(1, len(args) + 1):
         wf_complete[f"e{i}"] = SERVICES[i - 1]
         wf_complete[f"s{i}"] = workflow["services"][i - 1]["type"]
@@ -67,7 +68,8 @@ def get_simple_service_instance(workflow: list, args: list) -> str:
 
 if __name__ == "__main__":
     workflow = {
-        "type": "sequential",
+        "type": "alternative",
+        "p": 0.1,
         "services": [
             {
                 "type": "exponentialop",
