@@ -134,8 +134,11 @@ def load_load_results() -> pd.DataFrame:
 
     return df
 
-def load_single_performance_results(num_cores: list, mu: list, concurrent_users: int, iteration: int) -> pd.DataFrame | None:
-    folder_path = os.path.join(RESULT_FOLDER, "performance", f"{get_s(num_cores)}_core", str(get_s(mu)), f"{str(concurrent_users)}_users", str(iteration))
+def load_single_performance_results(num_cores: list, mu: list, concurrent_users: int, iteration: int, path: str = None) -> pd.DataFrame | None:
+    if path is not None:
+        folder_path = path
+    else:
+        folder_path = os.path.join(RESULT_FOLDER, "performance", f"{get_s(num_cores)}_core", str(get_s(mu)), f"{str(concurrent_users)}_users", str(iteration))
     
     file_path = os.path.join(folder_path, "metrics.json")
     with open(file_path) as train_file:
@@ -176,7 +179,7 @@ def load_single_performance_results(num_cores: list, mu: list, concurrent_users:
 
     return df
 
-def load_performance_results() -> pd.DataFrame:
+def load_performance_results(path: str = None) -> pd.DataFrame:
     # Load the results.
     df = pd.DataFrame()
     
@@ -185,7 +188,7 @@ def load_performance_results() -> pd.DataFrame:
             for mu in CLOSED_LOOP_EXPERIMENTS[exp]["MUs"]:
                 for iteration in range(CLOSED_LOOP_EXPERIMENTS[exp]["START"], CLOSED_LOOP_EXPERIMENTS[exp]["END"]):
                     for concurrent_users in CLOSED_LOOP_EXPERIMENTS[exp]["USERs"]:
-                        df = pd.concat([df, load_single_performance_results(num_cores, mu, concurrent_users, iteration)], ignore_index=True)
+                        df = pd.concat([df, load_single_performance_results(num_cores, mu, concurrent_users, iteration, path)], ignore_index=True)
 
     # remove the columns whose names contain the string 'contains' and 'type'
     df = df.loc[:,~df.columns.str.contains('contains|type')]
@@ -212,53 +215,70 @@ def check_law(df_performance: pd.DataFrame = None, df_load: pd.DataFrame = None)
         df_load = load_load_results()
 
     # for each load test calculate L, the number of concurrent requests. we can extract it from the vus column
-    job_sizes = df_performance.groupby(['cores', 'mu', 'users'], as_index=False).mean()
-    BASE_PLOT_FOLDER = os.path.join(RESULT_FOLDER, 'results')
-    if not os.path.exists(os.path.join(BASE_PLOT_FOLDER)):
-        os.makedirs(BASE_PLOT_FOLDER, exist_ok=True)
+    job_sizes = df_performance.groupby(['cores', 'mu', 'users', 'service'], as_index=False).mean()
 
     # plot T as a function of L, comparing theoretical and real values for each load rate and each service rate and each core
     for cores in OPEN_LOOP_EXPERIMENTS['high_load_experiment']["NUM_COREs"]:
         for mus in OPEN_LOOP_EXPERIMENTS["high_load_experiment"]["MUs"]:
             for mu in mus:
+                performance_df = job_sizes[job_sizes['mu'] == mu]
+                job_size = performance_df[np.logical_and(performance_df['users'] == 1, performance_df['cores'] == 1)]['job_size'].values[0]
                 for core in cores:
+                    # circolo chiuso
+                    performance_df = performance_df[performance_df['cores'] == core]
+
+                    users = pd.DataFrame({
+                        'lambda': performance_df['users'],
+                        'mean': performance_df['users']
+                    })
+                    times = performance_df[['users', 'duration']].rename(columns={'duration': 'mean', 'users': 'lambda'})
+
+                    lx = users[['lambda', 'mean']].copy()
+                    lx['mean'] = lx['mean'] * job_size / np.minimum(core, np.floor(lx['mean']))
+
+                    plot_theoretical_and_empirical(lx, times, mu, core, filename=f'check_law_closed_{mu}_{core}cores.png')
+
+                    # circolo aperto 
                     load_df = df_load[np.logical_and(df_load['cores'] == core, df_load['mu'] == mu)]
                     load_df = load_df.groupby(['metric_name', 'lambda'], as_index=False).mean()
-                    performance_df = job_sizes[np.logical_and(job_sizes['mu'] == mu, job_sizes['cores'] == core)]
-                    
-                    job_size = performance_df[performance_df['users'] == 1]['job_size'].values[0]
-                    
+                                        
                     users = load_df.loc[load_df.metric_name=='vus'] 
                     times = load_df.loc[load_df.metric_name=='http_req_duration']
 
-                    lx = users[['lambda', 'mean']].copy()
+                    lx = users[['lambda', 'mean']].copy() 
+                    # lx['u'] = lx['lambda'] * mu / 10e6
                     # lx['count'] = times["count"].values
-                    lx['mean'] = lx['mean'] * job_size / core
-                    lx['mean'].mean()
-                    times
-                    # plot the results
-                    plt.figure(figsize=(20, 12))
-                    plt.plot(lx['lambda'], lx['mean'], marker='.', linestyle='-', markersize=10, label='Theoretical')
-                    plt.plot(times['lambda'], times['mean'], marker='.', linestyle='-', markersize=10, label='Empirical')
+                    lx['mean'] = lx['mean'] * job_size / np.minimum(core, np.floor(lx['mean']))
+                    plot_theoretical_and_empirical(lx, times, mu, core, filename=f'check_law_open_{mu}_{core}cores.png')
                     
-                    # Set the title and labels.
-                    plt.title(f'Check law for mu = {mu} with R = {core} core ({TEST_SERVICE})')
-                    plt.xlabel('Lambda')
-                    plt.ylabel('Time')
+def plot_theoretical_and_empirical(df_theoretical: pd.DataFrame, df_empirical: pd.DataFrame, mu: list, core: list, filename: str = None) -> None:
+    BASE_PLOT_FOLDER = os.path.join(RESULT_FOLDER, 'results')
+    if not os.path.exists(os.path.join(BASE_PLOT_FOLDER)):
+        os.makedirs(BASE_PLOT_FOLDER, exist_ok=True)
 
-                    # Show the grid and legend
-                    plt.grid(True)
-                    legend = plt.legend(loc='upper left')
-                    for lh in legend.legend_handles:
-                        lh.set_alpha(1)
+    # plot the results
+    plt.figure(figsize=(20, 12))
+    plt.plot(df_theoretical['lambda'], df_theoretical['mean'], marker='.', linestyle='-', markersize=10, label='Theoretical')
+    plt.plot(df_empirical['lambda'], df_empirical['mean'], marker='.', linestyle='-', markersize=10, label='Empirical')
+    
+    # Set the title and labels.
+    plt.title(f'Check law for mu = {mu} with R = {core} core ({TEST_SERVICE})')
+    plt.xlabel('Users')
+    plt.ylabel('Time')
 
-                    # Save the plot.
-                    PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu))
-                    if not os.path.exists(PLOT_FOLDER):
-                        os.makedirs(PLOT_FOLDER, exist_ok=True)
-                        
-                    plt.savefig(os.path.join(PLOT_FOLDER, f'check_law_{mu}_{core}cores.png'))
-                    plt.close()
+    # Show the grid and legend
+    plt.grid(True)
+    legend = plt.legend(loc='upper left')
+    for lh in legend.legend_handles:
+        lh.set_alpha(1)
+
+    # Save the plot.
+    PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, str(mu))
+    if not os.path.exists(PLOT_FOLDER):
+        os.makedirs(PLOT_FOLDER, exist_ok=True)
+        
+    plt.savefig(os.path.join(PLOT_FOLDER, filename if filename is not None else f'check_law_{mu}_{core}cores.png'))
+    plt.close()
 
 def _plot_job_size(core_df: pd.DataFrame, mu: list, users: int, PLOT_FOLDER: str) -> None:
     # Create the plot.
@@ -306,7 +326,7 @@ def _plot_time(core_df: pd.DataFrame, mu: list, users: int, PLOT_FOLDER: str) ->
     plt.savefig(os.path.join(PLOT_FOLDER, f'{mu}_times.png'))
     plt.close()
 
-def _plot_all_job_sizes(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> None:
+def _plot_job_size_for_user(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> None:
     # Create the plot.
     plt.figure(figsize=(20, 12))
     for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
@@ -326,7 +346,7 @@ def _plot_all_job_sizes(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> Non
     plt.savefig(os.path.join(PLOT_FOLDER, f'{mu}_times.png'))
     plt.close()
 
-def _plot_all_times(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> None:
+def _plot_time_for_user(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> None:
     plt.figure(figsize=(20, 12))
 
     for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
@@ -347,7 +367,7 @@ def _plot_all_times(average: pd.DataFrame, mu: int, PLOT_FOLDER: str) -> None:
     plt.savefig(os.path.join(PLOT_FOLDER, f'job_sizes.png'))
     plt.close()
 
-def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
+def plot_times_and_job_sizes(df_performance: pd.DataFrame = None) -> None:
     ### Plot the results for each job_size and 
     # get the job size for each test and create a dataframe with it
     if df_performance is None:
@@ -372,10 +392,9 @@ def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
             if not os.path.exists(PLOT_FOLDER):
                 os.makedirs(PLOT_FOLDER, exist_ok=True)
 
-            for mu in mus:
-                ## plot the times
-                _plot_all_job_sizes(average, mu, PLOT_FOLDER)
-                _plot_all_times(average, mu, PLOT_FOLDER)
+            ## plot the times
+            _plot_job_size_for_user(average, mus[0], PLOT_FOLDER)
+            _plot_time_for_user(average, mus[0], PLOT_FOLDER)
 
         for user in CLOSED_LOOP_EXPERIMENTS["HIGH_RESOURCES"]["USERs"]:
             PLOT_FOLDER = os.path.join(BASE_PLOT_FOLDER, get_s(mus), str(user))
@@ -391,5 +410,9 @@ def plot_job_sizes(df_performance: pd.DataFrame = None) -> None:
     df_performance.to_csv(os.path.join(BASE_PLOT_FOLDER, 'performance_data.csv'), index=False)
 
 if __name__ == '__main__':
-    plot_job_sizes()
-    # check_law()
+    #plot_times_and_job_sizes()
+    check_law()
+
+    if WORKFLOW is not None:
+        if len(WORKFLOW['services']) > 1:
+            print('2 services')
