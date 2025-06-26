@@ -2,7 +2,7 @@ import os
 import time
 import subprocess
 from utility import WORKFLOW, CLOSED_LOOP_EXPERIMENTS, OPEN_LOOP_EXPERIMENTS, OPEN_LOOP_PATH, CLOSED_LOOP_PATH, RESULT_FOLDER, get_s
-#from utility import load_results, plot_results, plot_results_core, plot_results_mu, plot_job_sizes
+from utility import plot_times_and_job_sizes, check_law, load_performance_results, load_load_results
 from workflow_parser import get_workflow
 from docker_utility import SERVICES, create_containers, stop_containers
 
@@ -10,13 +10,10 @@ WORK_DIR = os.path.join(os.path.dirname(__file__), "work_dir")
 
 def download_results(output_folder: str, start: int, end:int) -> None:
     # Download the results from the Jaeger UI
-    if len(SERVICES) == 1:
-        return
-    
     start = start // 1000
     end = end // 1000
     
-    jaeger_url = f"http://localhost:16686/api/traces?service={{SERVICE_NAME}}&lookback=custom&start={start}&end={end}"
+    jaeger_url = f"http://localhost:16686/api/traces?limit=20000&service={{SERVICE_NAME}}&lookback=custom&start={start}&end={end}"
 
     # only one iteration because w3c trace context is the same for all the services supported
     for service in SERVICES:
@@ -72,6 +69,7 @@ def run_open_loop_test(mu: list, l: int, num_cores: list, iteration: int):
 
     csv_file = os.path.join(WORK_DIR, f"report.csv")
     env["K6_OUT"] = f"csv={csv_file}"
+    env["K6_CSV_TIME_FORMAT"] = "unix_micro"
     env["K6_WEB_DASHBOARD"] = "true"
     env["K6_WEB_DASHBOARD_EXPORT"] = os.path.join(WORK_DIR, f"report.html")
     env["K6_WEB_DASHBOARD_PERIOD"] = "1s"
@@ -109,6 +107,8 @@ if __name__ == '__main__':
                             run_closed_loop_test(mu=mu, num_cores=core, iteration=i, concurrent_users=users)
 
                 stop_containers(delete_containers=True)
+        
+            plot_times_and_job_sizes()
     
     if OPEN_LOOP:
         for key, value in OPEN_LOOP_EXPERIMENTS.items():
@@ -126,3 +126,7 @@ if __name__ == '__main__':
                             run_open_loop_test(mu=mu, l=l, num_cores=core, iteration=i)
                 
                 stop_containers(delete_containers=True)
+
+            performance_results = load_performance_results()
+            if CLOSED_LOOP or not performance_results.empty():
+                check_law(df_performance=performance_results)

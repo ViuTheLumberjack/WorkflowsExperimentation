@@ -75,6 +75,134 @@ def erlangC(m,p):
         suma += PowerFact(u,k)
     erlang = PowerFact(u,m) / ((PowerFact(u,m)) + (1-p)*suma)
     return erlang
+    
+def parse_jaeger_traces(file_path):
+    """
+    Parses a Jaeger JSON trace file to extract user-specific trace details
+    and find the overall time range of the traces.
+
+    Args:
+        file_path (str): The path to the Jaeger JSON file.
+
+    Returns:
+        tuple: A tuple containing (processed_traces, overall_start_us, overall_end_us).
+               - processed_traces (list): Traces with user_id, start, and end times.
+               - overall_start_us (int): The earliest start time in microseconds.
+               - overall_end_us (int): The latest end time in microseconds.
+    """
+    processed_traces = []
+    overall_min_start_time_us = float('inf')
+    overall_max_end_time_us = 0
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: The file '{file_path}' was not found.")
+        return [], 0, 0
+    except json.JSONDecodeError:
+        print(f"Error: The file '{file_path}' is not a valid JSON file.")
+        return [], 0, 0
+
+    if 'data' not in data or not isinstance(data['data'], list):
+        print("Error: JSON file does not have the expected Jaeger format (missing 'data' array).")
+        return [], 0, 0
+
+    for trace in data['data']:
+        user_id = None
+        min_start_time = float('inf')
+        max_end_time = 0
+
+        if 'spans' not in trace or not trace['spans']:
+            continue
+
+        # Determine the absolute start and end time for this trace
+        for span in trace['spans']:
+            start_time = span.get('startTime', 0)
+            duration = span.get('duration', 0)
+            end_time = start_time + duration
+            
+            if start_time < min_start_time:
+                min_start_time = start_time
+            if end_time > max_end_time:
+                max_end_time = end_time
+
+        if min_start_time != float('inf'):
+            processed_traces.append({
+                'user_id': user_id,
+                'duration': (max_end_time - min_start_time) // 1000,
+                'start_time_us': min_start_time,
+                'end_time_us': max_end_time
+            })
+            # Update overall min and max times
+            if min_start_time < overall_min_start_time_us:
+                overall_min_start_time_us = min_start_time
+            if max_end_time > overall_max_end_time_us:
+                overall_max_end_time_us = max_end_time
+
+    return pd.DataFrame(processed_traces), overall_min_start_time_us, overall_max_end_time_us
+
+def parse_metric_traces(file_path):
+    """
+    Parses a Jaeger JSON trace file to extract user-specific trace details
+    and find the overall time range of the traces.
+
+    Args:
+        file_path (str): The path to the Jaeger JSON file.
+
+    Returns:
+        tuple: A tuple containing (processed_traces, overall_start_us, overall_end_us).
+               - processed_traces (list): Traces with user_id, start, and end times.
+               - overall_start_us (int): The earliest start time in microseconds.
+               - overall_end_us (int): The latest end time in microseconds.
+    """
+    processed_traces = []
+    overall_min_start_time_us = float('inf')
+    overall_max_end_time_us = 0
+    
+    df = pd.read_csv(file_path)
+
+        # Filtra solo le righe con la metrica http_req_duration
+    durations = df[df["metric_name"] == "http_req_duration"].copy()
+
+    # Calcola tempo di inizio e fine in microsecondi
+    durations["start_time_us"] = durations["timestamp"] * 1_000_000
+    durations["end_time_us"] = (durations["timestamp"] + durations["metric_value"]) * 1_000_000
+
+    # Seleziona colonne utili
+    result = durations[["timestamp", "metric_value", "start_time_us", "end_time_us", "url", "metadata"]]
+
+    return pd.DataFrame(result), result["start_time_us"].min(), result["end_time_us"].max()
+
+def calculate_concurrency(traces, start_time_us: int, end_time_us: int, l = 1):
+    """
+    Calculates the number of concurrent users for each second between
+    the provided start and end times and returns a DataFrame.
+
+    Returns:
+        pd.DataFrame: with columns ['timestamp', 'concurrent_users']
+                      where 'timestamp' is in seconds from simulation start.
+    """
+    timestamps = []
+    concurrency_counts = []
+
+    timestep_us = 1_000_000 // l  # 1 second in microsenconds, adjusted by the load factor l
+
+    current_time_us = start_time_us + timestep_us // 2
+
+    while current_time_us <= end_time_us:
+        active_users = traces[(traces['start_time_us'] <= current_time_us) & (current_time_us < traces['end_time_us'])]        
+        
+        timestamps.append((current_time_us - start_time_us) // 1000)  # Convert microseconds to seconds
+        concurrency_counts.append(len(active_users))
+
+        current_time_us += timestep_us
+
+    df = pd.DataFrame({
+        'timestamp': timestamps,
+        'concurrent_users': concurrency_counts
+    })
+
+    return df
 
 def find_steady_state_start(diff_series, window=5, epsilon=0.5):
     for i in range(window, len(diff_series)):
@@ -96,7 +224,7 @@ def load_single_load_results(num_cores: list, mu: list, l: int, iteration: int) 
         # we are at steady state when difference between subsequent is similar
         differences = new_df[new_df['metric_name'] == 'vus']['metric_value'].diff()
 
-        steady_start = find_steady_state_start(differences, window=10, epsilon=4)
+        steady_start = find_steady_state_start(differences, window=10, epsilon=differences.std()*10)
         if steady_start:
             initial_timestamp = new_df.loc[differences.index[steady_start]]['timestamp']
             steady_df = new_df[new_df['timestamp'] >= initial_timestamp]
@@ -239,17 +367,18 @@ def check_law(df_performance: pd.DataFrame = None, df_load: pd.DataFrame = None)
                     plot_theoretical_and_empirical(lx, times, mu, core, filename=f'check_law_closed_{mu}_{core}cores.png')
 
                     # circolo aperto 
-                    load_df = df_load[np.logical_and(df_load['cores'] == core, df_load['mu'] == mu)]
+                    load_df = df_load[(df_load['cores'] == core) & (df_load['mu'] == mu)]
                     load_df = load_df.groupby(['metric_name', 'lambda'], as_index=False).mean()
                                         
                     users = load_df.loc[load_df.metric_name=='vus'] 
                     times = load_df.loc[load_df.metric_name=='http_req_duration']
 
                     lx = users[['lambda', 'mean']].copy() 
-                    # lx['u'] = lx['lambda'] * mu / 10e6
-                    # lx['count'] = times["count"].values
+                    #lx["mean"] = lx["mean"].apply(lambda x: x if x >= 1 else 1)
                     lx['mean'] = lx['mean'] * job_size / np.minimum(core, np.floor(lx['mean']))
                     plot_theoretical_and_empirical(lx, times, mu, core, filename=f'check_law_open_{mu}_{core}cores.png')
+    
+    df_load.to_csv(os.path.join(RESULT_FOLDER, 'results', 'load_results.csv'), index=False)
                     
 def plot_theoretical_and_empirical(df_theoretical: pd.DataFrame, df_empirical: pd.DataFrame, mu: list, core: list, filename: str = None) -> None:
     BASE_PLOT_FOLDER = os.path.join(RESULT_FOLDER, 'results')
@@ -410,8 +539,10 @@ def plot_times_and_job_sizes(df_performance: pd.DataFrame = None) -> None:
     df_performance.to_csv(os.path.join(BASE_PLOT_FOLDER, 'performance_data.csv'), index=False)
 
 if __name__ == '__main__':
-    #plot_times_and_job_sizes()
-    check_law()
+    performance_df = pd.read_csv(os.path.join(RESULT_FOLDER, 'results', 'performance_data.csv'))
+    # plot_times_and_job_sizes(performance_df)
+    load_df = load_load_results() #pd.read_csv(os.path.join(RESULT_FOLDER, 'results', 'load_results.csv'))
+    check_law(performance_df, load_df)
 
     if WORKFLOW is not None:
         if len(WORKFLOW['services']) > 1:

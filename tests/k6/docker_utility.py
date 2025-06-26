@@ -116,7 +116,7 @@ def create_containers(cpu_list: list):
     DOCKER_COMPOSE_FILE_PATH = create_docker_compose_file(cpu_list)
 
     # run the docker-compose up command
-    subprocess.run(['docker', 'compose', '-f', DOCKER_COMPOSE_FILE_PATH, 'up', '-d'])
+    subprocess.run(['docker', 'compose', '-f', DOCKER_COMPOSE_FILE_PATH, 'up', '-d', '--remove-orphans'])
     
     # wait for the services to start
     while True:
