@@ -45,7 +45,7 @@ def get_simple_workflow_instance(workflow: list, args: list) -> str:
     """
     #in the workflow 
     wf_complete = {}
-    wf_complete[f"p"] = workflow["p"]
+    wf_complete[f"p"] = workflow["p"] if "p" in workflow else 0.5
     for i in range(1, len(args) + 1):
         wf_complete[f"e{i}"] = SERVICES[i - 1]
         wf_complete[f"s{i}"] = workflow["services"][i - 1]["type"]
