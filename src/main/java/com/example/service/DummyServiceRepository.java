@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
@@ -36,53 +37,59 @@ public class DummyServiceRepository {
     }
 
     @WithSpan
-    public String doSequential(String endpoint1, String service1, String argument1, String paramN1, String endpoint2, String service2, String argument2, String paramN2) throws IOException {
+    public String doSequential(String endpoint1, String port1, String service1, String argument1, String paramN1,
+            String endpoint2, String port2, String service2, String argument2, String paramN2) throws IOException {
         // First service.
-        String response1 = sendGetRequest("http://" + endpoint1 + ":8080/service/" + service1 + "?" + paramN1 +"=" + argument1);
+        String response1 = sendGetRequest(
+                "http://" + endpoint1 + ":8080/service/" + service1 + "?" + paramN1 + "=" + argument1);
         // Second service.
-        String response2 = sendGetRequest("http://" + endpoint2 + ":8080/service/" + service2 + "?" + paramN2 +"=" + argument2);
+        String response2 = sendGetRequest(
+                "http://" + endpoint2 + ":8080/service/" + service2 + "?" + paramN2 + "=" + argument2);
         /// Set response.
-
+        System.out.println("Responses received from services.");
         return ("Composed Services:" +
                 "\n\t- Service 1:\n\t\t" + response1 +
-                "\n\t- Service 2:\n\t\t" + response2
-        );
+                "\n\t- Service 2:\n\t\t" + response2);
     }
 
     @WithSpan
-    public String doAlternative(float probability, String endpoint1, String service1, String argument1, String paramN1, String endpoint2, String service2, String argument2, String paramN2) throws IOException {
+    public String doAlternative(float probability, String endpoint1, String service1, String argument1,
+            String paramN1,
+            String endpoint2, String service2, String argument2, String paramN2) throws IOException {
 
         double randVal = random.nextDouble();
 
         String response;
         int i = 0;
 
-        if (randVal < probability){
+        if (randVal < probability) {
             // First service.
             i = 1;
-            response = sendGetRequest("http://" + endpoint1 + ":8080/service/" + service1 + "?" + paramN1 +"=" + argument1);
+            response = sendGetRequest(
+                    "http://" + endpoint1 + ":8080/service/" + service1 + "?" + paramN1 + "=" + argument1);
         } else {
             // Second service.
             i = 2;
-            response = sendGetRequest("http://" + endpoint2 + ":8080/service/" + service2 + "?" + paramN2 +"=" + argument2);
+            response = sendGetRequest(
+                    "http://" + endpoint2 + ":8080/service/" + service2 + "?" + paramN2 + "=" + argument2);
         }
 
         /// Set response.
         return ("Selected Service:" +
-                "\n\t- Service "+ i +" :\n\t\t" + response
-        );
+                "\n\t- Service " + i + " :\n\t\t" + response);
     }
 
     @WithSpan
-    public String doExponentialOperation(int max){
-        // Generate a random delay following an exponential distribution with the given lambda
-        double delay = (- Math.log(random.nextDouble())) * max;
+    public String doExponentialOperation(int max) {
+        // Generate a random delay following an exponential distribution with the given
+        // lambda
+        double delay = (-Math.log(random.nextDouble())) * max;
 
         // Busy wait for the generated delay.
         long startTime = System.currentTimeMillis();
 
         double sum = 0;
-        for (int i = 0; i < delay; i++){
+        for (int i = 0; i < delay; i++) {
             sum += sqrt(delay);
         }
 
@@ -92,11 +99,50 @@ public class DummyServiceRepository {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
 
         // Return the result.
-        return (
-                "Exponential Distribution Delay: " + delay + " ms\n" +
-                        "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
-                        "Elapsed time: " + (endTime - startTime) + " ms\n" +
-                        "End time: " + sdf.format(new Date(endTime)) + "ms"
-        );
+        return ("Exponential Distribution Delay: " + delay + " ms\n" +
+                "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
+                "Elapsed time: " + (endTime - startTime) + " ms\n" +
+                "End time: " + sdf.format(new Date(endTime)) + "ms");
+    }
+
+    @WithSpan
+    public String doUniformOperation(double EFT, double LFT) {
+        // Generate a random delay following a uniform distribution between EFT and LFT
+        double delay = EFT + random.nextDouble() * (LFT - EFT);
+        double sum = 0;
+
+        // Busy wait for the generated delay.
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < delay) {
+            sum += Math.sqrt(2);
+        }
+        long endTime = System.currentTimeMillis();
+
+        // Format the date.
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
+        return ("Uniform Distribution Delay: " + delay + " ms\n" +
+                "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
+                "End time: " + sdf.format(new Date(endTime)) + "ms");
+    }
+
+    public String doDeterministicOperation(double millis) {
+        double sum = 0;
+
+        // Busy wait for the given milliseconds.
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < millis) {
+            sum += sqrt(2); // Simulate some work
+        }
+
+        long endTime = System.currentTimeMillis();
+
+        // Format the date.
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
+
+        // Return the result.
+        return ("Deterministic Distribution Delay: " + millis + " ms\n" +
+                "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
+                "Elapsed time: " + (endTime - startTime) + " ms\n" +
+                "End time: " + sdf.format(new Date(endTime)) + "ms");
     }
 }

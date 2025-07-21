@@ -17,9 +17,12 @@ public class SequentialServiceServlet extends HttpServlet {
 
     @WithSpan
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String endpoint1 = request.getParameter("e1");
         String endpoint2 = request.getParameter("e2");
+        String port1 = request.getParameter("p1");
+        String port2 = request.getParameter("p2");
         String service1 = request.getParameter("s1");
         String service2 = request.getParameter("s2");
         String paramN1 = request.getParameter("n1");
@@ -27,49 +30,61 @@ public class SequentialServiceServlet extends HttpServlet {
         String argument1 = request.getParameter("a1");
         String argument2 = request.getParameter("a2");
 
-        if(endpoint1 == null || endpoint1.isEmpty()){
+        if (endpoint1 == null || endpoint1.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'endpoint1' is required");
             return;
         }
 
-        if(endpoint2 == null || endpoint2.isEmpty()){
+        if (endpoint2 == null || endpoint2.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'endpoint2' is required");
             return;
         }
 
-        if(service1 == null || service1.isEmpty()){
+        if (port1 == null || port1.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Parameters 'port1' is required");
+            return;
+        }
+
+        if (port2 == null || port2.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Parameters 'port2' is required");
+            return;
+        }
+
+        if (service1 == null || service1.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'service1' is required");
             return;
         }
 
-        if(argument1 == null || argument1.isEmpty()){
+        if (argument1 == null || argument1.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'argument1' is required");
             return;
         }
 
-        if(paramN1 == null || paramN1.isEmpty()){
+        if (paramN1 == null || paramN1.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'paramN1' is required");
             return;
         }
 
-        if(service2 == null || service2.isEmpty()){
+        if (service2 == null || service2.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'service2' is required");
             return;
         }
 
-        if(argument2 == null || argument2.isEmpty()){
+        if (argument2 == null || argument2.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'argument2' is required");
             return;
         }
 
-        if(paramN2 == null || paramN2.isEmpty()) {
+        if (paramN2 == null || paramN2.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Parameters 'paramN2' is required");
             return;
@@ -77,7 +92,9 @@ public class SequentialServiceServlet extends HttpServlet {
 
         try {
             response.setContentType("text/plain");
-            response.getWriter().write(dsr.doSequential(endpoint1, service1, argument1, paramN1, endpoint2, service2, argument2, paramN2));
+            response.getWriter().write(
+                    dsr.doSequential(endpoint1, port1, service1, argument1, paramN1, endpoint2, port2, service2,
+                            argument2, paramN2));
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Error composing services: " + e.getMessage());

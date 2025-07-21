@@ -10,12 +10,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+
 @WebServlet("/service/uniform")
 public class UniformServiceServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private Random random = new Random();
+    private DummyServiceRepository dsr = new DummyServiceRepository();
 
+    @WithSpan
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String paramEFT = request.getParameter("EFT");
@@ -40,25 +44,9 @@ public class UniformServiceServlet extends HttpServlet {
             return;
         }
 
-        // Generate a random delay following a uniform distribution between EFT and LFT
-        double delay = EFT + random.nextDouble() * (LFT - EFT);
-
-        // Busy wait for the generated delay.
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < delay) {
-            Math.sqrt(2);
-        }
-
-        // Format the date.
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
-
         // Return the result.
         response.setContentType("text/plain");
         response.getWriter().write(
-            "Uniform Distribution Delay: " + delay + " ms\n" +
-            "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
-            "Elapsed time: " + (System.currentTimeMillis() - startTime) + " ms\n" +
-            "End time: " + sdf.format(new Date(System.currentTimeMillis())) + "ms"
-        );
+                dsr.doUniformOperation(EFT, LFT));
     }
 }
