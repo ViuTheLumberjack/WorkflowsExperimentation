@@ -31,9 +31,9 @@ def get_num_services(workflow: dict) -> int:
     return count
 
 def get_workflow(workflow: dict, args: list) -> list:
-    if workflow["type"] in ["sequential", "parallel", "alternative", "deterministic"]:
+    if workflow["type"] in ["sequential", "parallel", "alternative"]:
         return get_simple_workflow_instance(workflow, args)
-    elif workflow["type"] in ["exponentialop", "sum", "exponential"]:
+    elif workflow["type"] in ["exponentialop", "sum", "exponential", "deterministic", "uniform"]:
         return get_simple_service_instance(workflow, args)
     else:
         raise ValueError(f"Unknown workflow type")
@@ -63,11 +63,15 @@ def get_simple_service_instance(workflow: list, args: list) -> str:
     #in the workflow 
     wf_complete = {}
     
-    wf_complete[workflow["arg_name"]] = args[0]
+    if "arg_name" in workflow:
+        wf_complete[workflow["arg_name"]] = args[0]
+    elif "args" in workflow:
+        for i, arg in enumerate(workflow["args"]):
+            wf_complete[arg] = args[i] if i < len(args) else None
 
     return workflow["type"] + "?" + urllib.parse.urlencode(wf_complete)
 
-if __name__ == "__main__":
+def sequential_wf_test():
     SERVICES = [
         ("exponentialop_0", 8080),
         ("exponentialop_0", 8081),
@@ -88,6 +92,22 @@ if __name__ == "__main__":
     }
 
     print(get_workflow(workflow, [1, 2]))
+
+if __name__ == "__main__":
+    SERVICES = [
+        ("uniform_0", 8080)
+    ]
+
+    workflow = {
+        "type": "uniform",
+        "args": [
+            "EFT",
+            "LFT"
+        ]
+    }
+
+    print(get_workflow(workflow, [1, 2]))
+
 
 # workflow parses the workflow and returns the api that must be called
 # /api/services/sequential?call=exponentialop&arg=max&val=750&next=exponentialop(max=750))&num=0
