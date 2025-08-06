@@ -16,7 +16,7 @@ def download_results(output_folder: str, start: int, end:int) -> None:
     jaeger_url = f"http://localhost:16686/api/traces?limit=20000&service={{SERVICE_NAME}}&lookback=custom&start={start}&end={end}"
 
     # only one iteration because w3c trace context is the same for all the services supported
-    for service in SERVICES:
+    for service, port in SERVICES:
         jaeger_service_url = jaeger_url.replace("{SERVICE_NAME}", service)
 
         response = subprocess.run(['curl', '-X', 'GET', jaeger_service_url], capture_output=True)

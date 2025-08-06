@@ -88,7 +88,7 @@ def create_docker_compose_file(cpu_list: list):
         service["volumes"] = [service["volumes"][i].replace("$HOME$", project_dir) for i in range(len(service["volumes"]))]
 
         service_name = f"{TEST_SERVICE}_{i}"
-        SERVICES.append(service_name)
+        SERVICES.append((service_name, 8080 + i))
 
         service["container_name"] = f"{TEST_SERVICE}_{i}"
         service["ports"] = [f"{8080 + i}:8080"]
@@ -121,7 +121,8 @@ def create_containers(cpu_list: list):
     # wait for the services to start
     while True:
         try:
-            subprocess.run(['curl', f'http://localhost:{8080}'], check=True)
+            for service_name, port in SERVICES:
+                subprocess.run(['curl', f'http://localhost:{port}'], check=True)
             break
         except subprocess.CalledProcessError:
             print("Waiting for the services to start")
