@@ -1,0 +1,58 @@
+services:
+  jaeger:
+    image: jaegertracing/jaeger:2.5.0
+    container_name: jaeger
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 5779:5779
+      - 14268:14268
+      - 14250:14250
+      - 14267:14267
+      - 4317:4317
+      - 4318:4318
+  exponentialop_0:
+    image: jboss/wildfly:latest
+    container_name: exponentialop_0
+    ports:
+      - 8080:8080
+    cpuset: '0'
+    environment:
+      - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
+      - OTEL_SERVICE_NAME=exponentialop_0
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    volumes:
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+  exponentialop_1:
+    image: jboss/wildfly:latest
+    container_name: exponentialop_1
+    ports:
+      - 8081:8080
+    cpuset: '1'
+    environment:
+      - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
+      - OTEL_SERVICE_NAME=exponentialop_1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    volumes:
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar

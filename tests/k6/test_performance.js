@@ -7,7 +7,7 @@ export const options = {
         average_time: {
             executor: 'constant-vus',
             vus: __ENV.CONCURRENT_USERS,
-            duration: '30s'
+            duration: '15s'
         }
     },
 };

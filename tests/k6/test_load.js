@@ -8,7 +8,7 @@ export const options = {
         average_time: {
             executor: 'constant-arrival-rate',
             rate: __ENV.RATE,
-            duration: '90s',
+            duration: '60s',
             preAllocatedVUs: 4000
         }
     },

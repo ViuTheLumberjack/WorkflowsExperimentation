@@ -33,8 +33,8 @@ services:
           cpus: '1'
           memory: 1024M
     volumes:
-      - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
-      - ../../../opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
   sequential_1:
     image: jboss/wildfly:latest
     container_name: sequential_1
@@ -54,5 +54,5 @@ services:
           cpus: '1'
           memory: 1024M
     volumes:
-      - ../../../target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
-      - ../../../opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar

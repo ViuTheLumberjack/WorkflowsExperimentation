@@ -7,18 +7,20 @@ export const options = {
     scenarios: {
         average_time: {
             executor: 'constant-vus',
-            vus: 2,
-            duration: '30s'
+            vus: 7,
+            duration: '15s'
         }
     },
 };
 
-const API_URL = 'http://localhost:8080/service/exponentialop?max=50000000';
+const API_URL = 'http://localhost:8080/service/deterministic?millis=500';
 
 export default function () {
     // Make a GET request to the target URL
     http.get(API_URL);
 }
+
+/*
 
 export function handleSummary(data) {
     const title = `prova1_metrics.json`;
@@ -27,3 +29,4 @@ export function handleSummary(data) {
 
     return obj;
 }
+    */

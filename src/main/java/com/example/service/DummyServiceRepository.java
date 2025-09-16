@@ -39,10 +39,10 @@ public class DummyServiceRepository {
     @WithSpan
     public String doSequential(String endpoint1, String port1, String service1, String argument1, String paramN1,
             String endpoint2, String port2, String service2, String argument2, String paramN2) throws IOException {
-        // First service.
+        
         String response1 = sendGetRequest(
                 "http://" + endpoint1 + ":8080/service/" + service1 + "?" + paramN1 + "=" + argument1);
-        // Second service.
+        
         String response2 = sendGetRequest(
                 "http://" + endpoint2 + ":8080/service/" + service2 + "?" + paramN2 + "=" + argument2);
         /// Set response.
@@ -111,10 +111,9 @@ public class DummyServiceRepository {
         double delay = EFT + random.nextDouble() * (LFT - EFT);
         double sum = 0;
 
-        // Busy wait for the generated delay.
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - startTime < delay) {
-            sum += Math.sqrt(2);
+            sum += Math.sqrt(delay);
         }
         long endTime = System.currentTimeMillis();
 
@@ -125,13 +124,13 @@ public class DummyServiceRepository {
                 "End time: " + sdf.format(new Date(endTime)) + "ms");
     }
 
+    @WithSpan
     public String doDeterministicOperation(double millis) {
         double sum = 0;
 
-        // Busy wait for the given milliseconds.
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - startTime < millis) {
-            sum += sqrt(2); // Simulate some work
+            sum += sqrt(millis); // Simulate some work
         }
 
         long endTime = System.currentTimeMillis();

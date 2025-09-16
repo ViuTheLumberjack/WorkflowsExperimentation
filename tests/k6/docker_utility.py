@@ -6,9 +6,10 @@ import subprocess
 import time
 import math
 from ruamel.yaml import YAML, representer
-from utility import TEST_SERVICE
+# from utility import TEST_SERVICE
 
-DOCKER_COMPOSE_FILE_FOLDER = os.path.join(os.path.dirname(__file__), "dockerfiles")
+# DOCKER_COMPOSE_FILE_FOLDER = os.path.join(os.path.dirname(__file__), "dockerfiles")
+# LIMIT_THREADS = True
 
 SERVICE_TEMPLATE = {
     "image": "jboss/wildfly:latest",
@@ -20,6 +21,7 @@ SERVICE_TEMPLATE = {
     "environment" : [
         "JAVA_TOOL_OPTIONS=\"-javaagent:/usr/local/opentelemetry-javaagent.jar\"",
         "OTEL_SERVICE_NAME={CONTAINER_NAME}",
+        "MAX_THREADS={THREADS}",
         "OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317",
         "OTEL_EXPORTER_OTLP_PROTOCOL=grpc",
         "OTEL_LOGS_EXPORTER=none",
@@ -35,7 +37,8 @@ SERVICE_TEMPLATE = {
     },
     "volumes": [
         "$HOME$/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war",
-        "$HOME$/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar"
+        "$HOME$/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar",
+        "$HOME$/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml"
     ]
 }
 
@@ -52,7 +55,17 @@ def find_project_root(start_path: os.path, marker=".git"):
             raise FileNotFoundError(f"Marker '{marker}' not found.")
         current = parent
 
-def create_docker_compose_file(cpu_list: list):
+def create_docker_compose_file(workflow_config: dict, options: dict = None, limit_threads: bool = None) -> str:
+    DOCKER_COMPOSE_FILE_FOLDER = os.path.join(options["RESULT_FOLDER"] if options and "RESULT_FOLDER" in options else ".", "dockerfiles")
+    LIMIT_THREADS = limit_threads if limit_threads is not None else False
+    TEST_SERVICE = options["TEST_SERVICE"] if options and "TEST_SERVICE" in options else "test_service"
+    
+    if not os.path.exists(DOCKER_COMPOSE_FILE_FOLDER):
+        os.makedirs(DOCKER_COMPOSE_FILE_FOLDER, exist_ok=True)
+
+    cpu_list = workflow_config if isinstance(workflow_config[0], list) else [entry["core"] for entry in workflow_config]
+
+
     docker_file_dict = {
         "services": {} ,
     }
@@ -87,18 +100,19 @@ def create_docker_compose_file(cpu_list: list):
 
         service["volumes"] = [service["volumes"][i].replace("$HOME$", project_dir) for i in range(len(service["volumes"]))]
 
-        service_name = f"{TEST_SERVICE}_{i}"
+        service_name = f"{TEST_SERVICE}_{i}" if workflow_config is None or isinstance(workflow_config[0], list) else workflow_config[i]["name"]
         SERVICES.append((service_name, 8080 + i))
 
-        service["container_name"] = f"{TEST_SERVICE}_{i}"
+        service["container_name"] = service_name
         service["ports"] = [f"{8080 + i}:8080"]
         service["cpuset"] = ','.join(cpus)
         service["deploy"]["resources"]["limits"]["cpus"] = f"{cpu_list[i]}"
         service["environment"][1] = service["environment"][1].replace("{CONTAINER_NAME}", f"{service_name}")
+        service["environment"][2] = service["environment"][2].replace("{THREADS}", f"{cpu_list[i] if LIMIT_THREADS else cpu_list[i]*16}")
 
         docker_file_dict["services"][service_name] = service
     
-    DOCKER_COMPOSE_FILE_PATH = os.path.join(DOCKER_COMPOSE_FILE_FOLDER, f"docker-compose-{TEST_SERVICE}-{cpu_list}.yml")
+    DOCKER_COMPOSE_FILE_PATH = os.path.join(DOCKER_COMPOSE_FILE_FOLDER, f"docker-compose-{cpu_list}.yml")
 
     with io.open(DOCKER_COMPOSE_FILE_PATH, 'w', encoding='utf8') as outfile:
         representer.RoundTripRepresenter.ignore_aliases = lambda x, y: True
@@ -111,9 +125,9 @@ def create_docker_compose_file(cpu_list: list):
 
     return DOCKER_COMPOSE_FILE_PATH
 
-def create_containers(cpu_list: list):
+def create_containers(cpu_list: list, options: dict = None, limit_threads: bool = None) -> None:
     # create the docker-compose file and save it
-    DOCKER_COMPOSE_FILE_PATH = create_docker_compose_file(cpu_list)
+    DOCKER_COMPOSE_FILE_PATH = create_docker_compose_file(cpu_list, options, limit_threads)
 
     # run the docker-compose up command
     subprocess.run(['docker', 'compose', '-f', DOCKER_COMPOSE_FILE_PATH, 'up', '-d', '--remove-orphans'])
@@ -138,5 +152,5 @@ def stop_containers(delete_containers: bool = True):
         subprocess.run(['docker', 'compose', 'stop'])
 
 if __name__ == "__main__":
-    cpu_list = [1]
-    create_docker_compose_file(cpu_list)
+    cpu_list = [4]
+    print(create_docker_compose_file(cpu_list))

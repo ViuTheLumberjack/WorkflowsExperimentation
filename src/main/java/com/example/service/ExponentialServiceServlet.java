@@ -34,14 +34,16 @@ public class ExponentialServiceServlet extends HttpServlet {
             return;
         }
 
-        // Generate a random delay following an exponential distribution with the given lambda
-        double delay = - Math.log(random.nextDouble()) / lambda;
+        double sum = 0;
+        double delay = -Math.log(random.nextDouble()) / lambda;
 
         // Busy wait for the generated delay.
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - startTime < delay) {
-            Math.sqrt(2);
+            sum += Math.sqrt(2);
         }
+
+        long endTime = System.currentTimeMillis();
 
         // Format the date.
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
@@ -49,10 +51,9 @@ public class ExponentialServiceServlet extends HttpServlet {
         // Return the result.
         response.setContentType("text/plain");
         response.getWriter().write(
-            "Exponential Distribution Delay: " + delay + " ms\n" +
-            "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
-            "Elapsed time: " + (System.currentTimeMillis() - startTime) + " ms\n" +
-            "End time: " + sdf.format(new Date(System.currentTimeMillis())) + "ms"
-        );
+                "Exponential Distribution Delay: " + delay + " ms\n" +
+                        "Start time: " + sdf.format(new Date(startTime)) + "ms\n" +
+                        "Elapsed time: " + (endTime - startTime) + " ms\n" +
+                        "End time: " + sdf.format(new Date(endTime)) + "ms");
     }
 }

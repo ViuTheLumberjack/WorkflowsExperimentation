@@ -1,11 +1,14 @@
 .idea
+.vscode
 target
 tests/env/
-tests/k6/*/load
-tests/k6/*/performance
+tests/k6/*/*/load
+tests/k6/*/*/performance
+tests/k6/*/*/results
 node_modules/
 tests/__pycache__/
 tests/k6/__pycache__/
 tests/k6/downloads/*
 tests/k6/work_dir
-tests/k6/dockerfiles/
+tests/k6/*/dockerfiles/
+tests/k6/*/test/

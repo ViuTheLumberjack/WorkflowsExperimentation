@@ -1,0 +1,73 @@
+{
+    "name": "sequential",
+    "nodes": [
+        {
+            "name": "first",
+            "cores": [
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "name": "second",
+            "cores": [
+                1,
+                2,
+                3
+            ]
+        }
+    ],
+    "workflow": [
+        {
+            "node_name": "first",
+            "type": "sequential",
+            "services": [
+                {
+                    "node_name": "first",
+                    "type": "exponentialop",
+                    "arg_name": "max",
+                    "arg_values": [
+                        25000000,
+                        50000000
+                    ]
+                },
+                {
+                    "node_name": "second",
+                    "type": "exponentialop",
+                    "arg_name": "max",
+                    "arg_values": [
+                        25000000,
+                        50000000
+                    ]
+                }
+            ]
+        },
+        {
+            "node_name": "second",
+            "type": "deterministic",
+            "arg_name": "millis",
+            "arg_values": [
+                1000
+            ]
+        }
+    ],
+    "load": {
+        "start": 1,
+        "end": 6,
+        "loads": [
+            {
+                "type": "closed_loop",
+                "users": [
+                    5
+                ]
+            },
+            {
+                "type": "closed_loop",
+                "users": [
+                    9
+                ]
+            }
+        ]
+    }
+}
