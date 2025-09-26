@@ -1,11 +1,14 @@
+import itertools
 import os
 import re
+from typing import Any
 import numpy as np
 import pandas as pd
 import json
 from math import pow,factorial,log,exp
 from matplotlib import pyplot as plt, colors
-from options_utility import parse_args, get_test_options
+from options_utility import extract_arg_values, parse_args, get_test_options
+from workflow_parser import WorkflowIterator
 
 def get_s(l: list) -> str:
     """
@@ -173,104 +176,27 @@ def find_steady_state_start(diff_series, window=5, epsilon=0.5):
             return i - window  # Index where steady state starts
     return None
 
-def load_single_load_results(num_cores: list, mu: list, l: int, iteration: int) -> pd.DataFrame | None:
-    if len(num_cores) > 1:
-        # TODO: HANDLE THE CASE WHEN WE HAVE MORE THAN 1 SERVICE, HENCE WE ARE IN A WORKFLOW
-        pass
-    else :
-        
-        if False:
-            file_path = os.path.join(RESULT_FOLDER, "load", f"{get_s(num_cores)}_core", str(get_s(mu)), str(l), str(iteration), f"report.csv")
-            new_df = pd.read_csv(file_path)
-            new_df = new_df[new_df['metric_name'].isin(["vus", "http_req_duration"])]
-            differences = new_df[new_df['metric_name'] == 'vus']['metric_value'].diff()
-            # get only the data at steady state
-            # we are at steady state when difference between subsequent is similar
-
-            steady_start = find_steady_state_start(differences, window=10, epsilon=40)
-            if steady_start:
-                initial_timestamp = new_df.loc[differences.index[steady_start]]['timestamp']
-                steady_df = new_df[new_df['timestamp'] >= initial_timestamp]
-            else:
-                # TODO: handle the case when steady state is not found
-                steady_df = new_df
-        else:
-            file_path = os.path.join(RESULT_FOLDER, "load", f"{get_s(num_cores)}_core", str(get_s(mu)), str(l), str(iteration), f"jaeger.json")
-            new_df, start, end = parse_jaeger_traces(file_path)
-            new_df['metric_name'] = "http_req_duration"
-            new_df['metric_value'] = new_df['duration']
-            users_timeline = calculate_concurrency(new_df, start, end, l)
-            users_timeline['metric_name'] = "vus"
-            users_timeline['metric_value'] = users_timeline['concurrent_users']
-            # TODO: Filter for steady state
-            steady_df = pd.concat([new_df, users_timeline], ignore_index=True)
-
-        # compute run statistics, so mean time values and mean vus
-        stats_df = steady_df.groupby(['metric_name']).agg(
-            mean=('metric_value', 'mean'),
-            min=('metric_value', 'min'),
-            max=('metric_value', 'max'),
-            std=('metric_value', 'std'),
-            count=('metric_value', 'count'),
-            median=('metric_value', 'median')
-        ).reset_index()
-
-        stats_df['mu'] = mu[0]
-        stats_df['lambda'] = l
-        stats_df['cores'] = num_cores[0]
-        stats_df['iteration'] = iteration
-
-        return stats_df
-
-def load_load_results() -> pd.DataFrame:
-    # Load the results.
+def load_single_performance_results(num_cores: list, mu: list, concurrent_users: int, iteration: int, path: str = None) -> pd.DataFrame | None:
+    folder_path = path
+    # df = pd.json_normalize(dict['metrics'])
     df = pd.DataFrame()
     
-    for exp in OPEN_LOOP_EXPERIMENTS:
-        for num_cores in OPEN_LOOP_EXPERIMENTS[exp]["NUM_COREs"]:
-            for mu in OPEN_LOOP_EXPERIMENTS[exp]["MUs"]:
-                for l in OPEN_LOOP_EXPERIMENTS[exp]["LAMBDAs"]:
-                    for iteration in range(OPEN_LOOP_EXPERIMENTS[exp]["START"], OPEN_LOOP_EXPERIMENTS[exp]["END"]):
-                        df = pd.concat([df, load_single_load_results(num_cores, mu, l, iteration)], ignore_index=True)
-
-    return df
-
-def load_single_performance_results(num_cores: list, mu: list, concurrent_users: int, iteration: int, path: str = None) -> pd.DataFrame | None:
-    if path is not None:
-        folder_path = path
-    else:
-        folder_path = os.path.join(RESULT_FOLDER, "performance", f"{get_s(num_cores)}_core", str(get_s(mu)), f"{str(concurrent_users)}_users", str(iteration))
-    
-    file_path = os.path.join(folder_path, "metrics.json")
+    file_path = os.path.join(folder_path, "jaeger.json")
+    spans = []
     with open(file_path) as train_file:
         dict = json.load(train_file)
-
-    df = pd.json_normalize(dict['metrics'])
-
-    if len(num_cores) > 1:
-        file_path = os.path.join(folder_path, "jaeger.json")
         spans = []
-        with open(file_path) as train_file:
-            dict = json.load(train_file)
-            spans = []
-            for trace in dict['data']:
-                for span in trace['spans']:
-                    if re.match("GET /", span['operationName']):
-                        spans.append(span)
-            
-            durations = pd.DataFrame([(span['duration'], span['processID']) for span in spans], columns=['duration', 'service'])
-            mean_duration = durations.groupby('service')['duration'].mean().reset_index()
-            
-            df = pd.concat(
-            [
-                mean_duration,
-                pd.Series(num_cores, name='cores'),
-                pd.Series(mu, name='mu'), 
-                pd.Series(np.repeat(iteration, len(num_cores)), name='iteration'),
-                pd.Series(np.repeat(int(df['vus_max.values.max'].iloc[0]), len(num_cores)), name='users'), 
-                df
-            ], axis=1)
-    else:
+        for trace in dict['data']:
+            for span in trace['spans']:
+                if re.match("GET /", span['operationName']):
+                    spans.append(span)
+        
+        durations = pd.DataFrame([(span['duration'], span['processID']) for span in spans], columns=['duration', 'service'])
+        mean_duration = durations.groupby('service')['duration'].mean().reset_index()
+
+        #TODO: Separate by each load
+        df = mean_duration
+   
         df['users'] = df['vus_max.values.max']
         df['iteration'] = iteration
         df['duration'] = df['http_req_duration.values.avg']
@@ -280,18 +206,28 @@ def load_single_performance_results(num_cores: list, mu: list, concurrent_users:
 
     return df
 
-def load_performance_results(path: str = None) -> pd.DataFrame:
+def load_performance_results(options: dict[str, Any]) -> pd.DataFrame:
     # Load the results.
     df = pd.DataFrame()
-    
-    for exp in CLOSED_LOOP_EXPERIMENTS:
-        for num_cores in CLOSED_LOOP_EXPERIMENTS[exp]["NUM_COREs"]:
-            for mu in CLOSED_LOOP_EXPERIMENTS[exp]["MUs"]:
-                for iteration in range(CLOSED_LOOP_EXPERIMENTS[exp]["START"], CLOSED_LOOP_EXPERIMENTS[exp]["END"]):
-                    for concurrent_users in CLOSED_LOOP_EXPERIMENTS[exp]["USERs"]:
-                        df = pd.concat([df, load_single_performance_results(num_cores, mu, concurrent_users, iteration, path)], ignore_index=True)
 
-    # remove the columns whose names contain the string 'contains' and 'type'
+    core_combinations = [
+        [ {"name": d["name"], "core": c} for d, c in zip(options["NODES"], combo) ]
+        for combo in itertools.product(*(d["cores"] for d in options["NODES"]))
+    ]
+
+    for c in core_combinations:
+        load_combinations = itertools.product(*(d["users"] if "users" in d else d["rate"] for d in options["LOAD"]["loads"]))
+
+        for l in load_combinations:
+            for i in range(options["LOAD"]['start'], options["LOAD"]['end']):
+                it = WorkflowIterator(options["WORKFLOW"])
+                for arg_comb, calls in it:
+                    path = os.path.join(options["RESULT_FOLDER"], "test", f"{get_s([d['core'] for d in c])}", get_s(l), str(get_s(extract_arg_values(arg_comb))), str(i))
+                    single_df = load_single_performance_results([d["core"] for d in c], arg_comb, l[0] if isinstance(l, tuple) else l, i, path)
+                    if single_df is not None:
+                        df = pd.concat([df, single_df], ignore_index=True)
+
+    
     df = df.loc[:,~df.columns.str.contains('contains|type')]
 
     return df.fillna(0)
@@ -546,20 +482,10 @@ def plot_times_and_job_sizes(df_performance: pd.DataFrame = None) -> None:
 if __name__ == '__main__':
     args = parse_args()
 
-    os.makedirs(WORK_DIR, exist_ok=True)
+    #os.makedirs(WORK_DIR, exist_ok=True)
     options = get_test_options(args.path)
 
-    # All possible combinations of cores for each node
-    core_combinations = [
-        [ {"name": d["name"], "core": c} for d, c in zip(options["NODES"], combo) ]
-        for combo in itertools.product(*(d["cores"] for d in options["NODES"]))
-    ]
-
-    performance_df = get_performance_data()
+    performance_df = load_performance_results(options)
     plot_times_and_job_sizes(performance_df)
     load_df = pd.read_csv(os.path.join(RESULT_FOLDER, 'results', 'load_results.csv'))
     check_law(performance_df, load_df)
-
-    if WORKFLOW is not None:
-        if len(WORKFLOW['services']) > 1:
-            print('2 services')

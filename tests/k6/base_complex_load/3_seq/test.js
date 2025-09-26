@@ -29,19 +29,46 @@ const instrumentedHTTP = new tempo.Client({
 
 export function call_0 () {
     // Make a GET request to the target URL
-    instrumentedHTTP.get(__ENV.API_URL_0, {
+    
+    instrumentedHTTP.get("http://localhost:8080/service/"+__ENV.API_URL_00, {
         headers: {
             'X-Example-Header': 'instrumented/request',
-        }
+        },
+        tags: {
+            service_name: 'first',
+        },
     });
+
+    instrumentedHTTP.get("http://localhost:8081/service/"+__ENV.API_URL_01, {
+        headers: {
+            'X-Example-Header': 'instrumented/request',
+        },
+        tags: {
+            service_name: 'second',
+        },
+    });
+
+    instrumentedHTTP.get("http://localhost:8082/service/"+__ENV.API_URL_02, {
+        headers: {
+            'X-Example-Header': 'instrumented/request',
+        },
+        tags: {
+            service_name: 'third',
+        },
+    });
+
 }
 
 export function call_1 () {
     // Make a GET request to the target URL
-    instrumentedHTTP.get(__ENV.API_URL_1, {
+    
+    instrumentedHTTP.get("http://localhost:8081/service/"+__ENV.API_URL_1, {
         headers: {
             'X-Example-Header': 'instrumented/request',
-        }
+        },
+        tags: {
+            service_name: 'second',
+        },
     });
 }
 

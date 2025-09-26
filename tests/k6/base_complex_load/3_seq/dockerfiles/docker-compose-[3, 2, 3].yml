@@ -19,11 +19,11 @@ services:
     container_name: first
     ports:
       - 8080:8080
-    cpuset: '0'
+    cpuset: 0,1,2
     environment:
       - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
       - OTEL_SERVICE_NAME=first
-      - MAX_THREADS=16
+      - MAX_THREADS=48
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_LOGS_EXPORTER=none
@@ -31,7 +31,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '3'
           memory: 1024M
     volumes:
       - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
@@ -42,7 +42,7 @@ services:
     container_name: second
     ports:
       - 8081:8080
-    cpuset: 1,2
+    cpuset: 3,4
     environment:
       - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
       - OTEL_SERVICE_NAME=second
@@ -55,6 +55,29 @@ services:
       resources:
         limits:
           cpus: '2'
+          memory: 1024M
+    volumes:
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+      - /mnt/s/Projects/qesm/docker-workflows-experimentation/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
+  third:
+    image: jboss/wildfly:latest
+    container_name: third
+    ports:
+      - 8082:8080
+    cpuset: 5,6,7
+    environment:
+      - JAVA_TOOL_OPTIONS="-javaagent:/usr/local/opentelemetry-javaagent.jar"
+      - OTEL_SERVICE_NAME=third
+      - MAX_THREADS=48
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
+    deploy:
+      resources:
+        limits:
+          cpus: '3'
           memory: 1024M
     volumes:
       - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war

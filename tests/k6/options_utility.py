@@ -2,6 +2,28 @@ import os
 import argparse
 import json
 
+def extract_arg_values(nodes):
+    """
+    Recursively extract 'arg_values' from a list of objects (forest of trees).
+    
+    Args:
+        nodes (list): List of objects representing the forest of trees.
+    
+    Returns:
+        list: A list of all 'arg_values' found in the leaf nodes.
+    """
+    arg_values = []
+    
+    for node in nodes:
+        # If 'arg_values' exists in the current node, add it to the result
+        if 'arg_values' in node:
+            arg_values.append(node['arg_values'][0])
+        # If the node has children, recurse into them
+        if 'services' in node and isinstance(node['services'], list):
+            arg_values.append(extract_arg_values(node['services']))
+
+    return arg_values
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the tests")
     # Test args

@@ -1,26 +1,53 @@
-// Import the http module to make HTTP requests. From this point, you can use `http` methods to make HTTP requests.
-import tempo from '../http-instrumentation-tempo.js';
+
+import tempo from '../../http-instrumentation-tempo.js';
 
 export const options = {
     summaryTimeUnit: 's',
     scenarios: {
-        average_time: {
-            executor: 'constant-arrival-rate',
-            rate: 5,
-            duration: '15s',
-            preAllocatedVUs: 2000,
-        }
+        
+closed_loop_0: {
+    executor: 'constant-vus',
+    vus: __ENV.RATE_0,
+    duration: '15s',
+    exec: 'call_0',
+},
+
+closed_loop_1: {
+    executor: 'constant-vus',
+    vus: __ENV.RATE_1,
+    duration: '15s',
+    exec: 'call_1',
+},
+
     },
 };
 
-const API_URL = `http://localhost:8080/service/deterministic?millis=5`;
 const instrumentedHTTP = new tempo.Client({
     propagator: 'w3c',
 });
 
-export default function () {
+
+export function call_0 () {
     // Make a GET request to the target URL
-    instrumentedHTTP.get(API_URL, {
+    
+    instrumentedHTTP.get("http://localhost:8080/service/"+__ENV.CALL_00, {
+        headers: {
+            'X-Example-Header': 'instrumented/request',
+        }
+    });
+
+    instrumentedHTTP.get("http://localhost:8081/service/"+__ENV.CALL_01, {
+        headers: {
+            'X-Example-Header': 'instrumented/request',
+        }
+    });
+
+}
+
+export function call_1 () {
+    // Make a GET request to the target URL
+    
+    instrumentedHTTP.get("http://localhost:8081/service/"+__ENV.CALL_1), {
         headers: {
             'X-Example-Header': 'instrumented/request',
         }
@@ -29,7 +56,7 @@ export default function () {
 
 
 export function handleSummary(data) {
-    const title = `test1_metrics.json`;
+    const title = `${__ENV.OUTPUT_PATH}/${__ENV.OUTPUT_NAME}`;
     var obj = {}
     obj[title] = JSON.stringify(data);
 

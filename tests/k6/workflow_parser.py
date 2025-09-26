@@ -30,7 +30,7 @@ class WorkflowIterator:
 
     def __next__(self):
         combo = next(self._iterator)  # may raise StopIteration naturally
-        return list(combo), [get_workflow(wf) for wf in combo]
+        return list(combo)
 
 def get_num_services(workflow: dict) -> int:
     """

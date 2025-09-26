@@ -8,7 +8,7 @@ from utility import get_s, plot_times_and_job_sizes, check_law, load_performance
 from workflow_parser import get_workflow, WorkflowIterator
 from test_utility import generate_test
 from docker_utility import SERVICES, create_containers, stop_containers
-from options_utility import parse_args, get_test_options
+from options_utility import extract_arg_values, parse_args, get_test_options
 
 WORK_DIR = os.path.join(os.path.dirname(__file__), "work_dir")
 
@@ -37,29 +37,7 @@ def move_to(source: str, dest: str) -> None:
     if os.path.exists(source):
         subprocess.run(['mv', source, dest])
 
-def extract_arg_values(nodes):
-    """
-    Recursively extract 'arg_values' from a list of objects (forest of trees).
-    
-    Args:
-        nodes (list): List of objects representing the forest of trees.
-    
-    Returns:
-        list: A list of all 'arg_values' found in the leaf nodes.
-    """
-    arg_values = []
-    
-    for node in nodes:
-        # If 'arg_values' exists in the current node, add it to the result
-        if 'arg_values' in node:
-            arg_values.append(node['arg_values'][0])
-        # If the node has children, recurse into them
-        if 'services' in node and isinstance(node['services'], list):
-            arg_values.append(extract_arg_values(node['services']))
-
-    return arg_values
-
-def run_test(options: dict, calls: list[str], core_combination: list[int], arg_combination: list[int], l: list[float], test_path: str, iteration: int) -> None:
+def run_test(options: dict, core_combination: list[int], arg_combination: list[int], l: list[float], test_path: str, iteration: int) -> None:
     cc = [d["core"] for d in core_combination]
     extracted_arg_values = extract_arg_values(arg_combination)
     OUTPUT_FOLDER = os.path.join(options["RESULT_FOLDER"], "test", get_s(cc),  get_s(l), get_s(extracted_arg_values), str(iteration))
@@ -67,13 +45,25 @@ def run_test(options: dict, calls: list[str], core_combination: list[int], arg_c
 
     env = os.environ.copy()
     env.clear()
-    for i in range(len(calls)):
+    #user-def
+    for i, workflow in enumerate(options["WORKFLOW"]):
         env[f"RATE_{i}"] = str(l[i])
-    for i in range(len(calls)):
-        env[f"API_URL_{i}"] = calls[i]
+        if "services" in workflow:
+            for j, element in enumerate(workflow.get("services", [])):
+                call_api_url = get_workflow(element)
+                env[f"API_URL_{str(i)+str(j)}"] = call_api_url
+        else:
+            call_api_url = get_workflow(workflow)
+            env[f"API_URL_{i}"] = call_api_url
     
     env["OUTPUT_PATH"] = os.path.join(WORK_DIR)
     env["OUTPUT_NAME"] = f"metrics.json"
+    #K6 csv output
+    csv = os.path.join(WORK_DIR, f"report.csv")
+    env["K6_CSV_TIME_FORMAT"] = "unix_micro"
+    env["K6_OUT"] = f"csv={csv}"
+    env["K6_CSV_TIME_FORMAT"] = "unix_micro"
+    #k6 debug output
     env["K6_WEB_DASHBOARD"] = "false"
     env["K6_WEB_DASHBOARD_EXPORT"] = os.path.join(WORK_DIR, f"report.html")
     env["K6_WEB_DASHBOARD_PERIOD"] = "1s"
@@ -85,6 +75,7 @@ def run_test(options: dict, calls: list[str], core_combination: list[int], arg_c
     print(f"Test {arg_combination} {core_combination} {l} {iteration} completed.")
     move_to(os.path.join(WORK_DIR, "metrics.json"), os.path.join(OUTPUT_FOLDER, "metrics.json"))
     move_to(os.path.join(WORK_DIR, "report.html"), os.path.join(OUTPUT_FOLDER, "report.html"))
+    move_to(os.path.join(WORK_DIR, "report.csv"), os.path.join(OUTPUT_FOLDER, "report.csv"))
     download_results(OUTPUT_FOLDER, start, end)
 
     
@@ -152,24 +143,22 @@ if __name__ == '__main__':
         for combo in itertools.product(*(d["cores"] for d in options["NODES"]))
     ]
 
-    load_combinations = itertools.product(*(d["users"] if "users" in d else d["rate"] for d in options["LOAD"]["loads"]))
-    # generate the test template
-    test_path = generate_test(options)
-
     for c in core_combinations:
         create_containers(c, options, args.limit_threads)
+        # generate the test template
+        test_path = generate_test(options)
         services_dict = {key: value for key, value in SERVICES}
-        print(services_dict)
+        load_combinations = itertools.product(*(d["users"] if "users" in d else d["rate"] for d in options["LOAD"]["loads"]))
+        # print(services_dict)
 
         for l in load_combinations:
             for i in range(options["LOAD"]['start'], options["LOAD"]['end']):
                 it = WorkflowIterator(options["WORKFLOW"])
-                for arg_comb, calls in it:
-                    calls = [f"http://localhost:{services_dict[wf['node_name']]}/service/{c}" for (c, wf) in zip(calls, options["WORKFLOW"])]
-                    print(calls)
-                    run_test(options, calls, c, arg_comb, l, test_path, i)
+                for arg_comb in it:
+                    run_test(options, c, arg_comb, l, test_path, i)
 
         stop_containers(delete_containers=True)
+        print(f"All tests for core combination {c} completed.")
             
     if False: # v1 code. Ignore
         CLOSED_LOOP = args.closed_loop
