@@ -11,19 +11,28 @@ class WorkflowIterator:
 
     def _expand_workflow(self, workflow):
         """Expand one workflow into all combinations of its arg_values."""
-        if "services" in workflow:  # Sequential workflow with nested services
-            services = workflow["services"]
-            arg_lists = [srv["arg_values"] for srv in services]
-            for combo in product(*arg_lists):
-                new_wf = copy.deepcopy(workflow)
-                for srv, val in zip(new_wf["services"], combo):
-                    srv["arg_values"] = [val]
-                yield new_wf
-        else:  # Single service workflow
-            for val in workflow["arg_values"]:
-                new_wf = copy.deepcopy(workflow)
-                new_wf["arg_values"] = [val]
-                yield new_wf
+        yield from self._expand_node(workflow)
+
+    def _expand_node(self, node):
+        service_expansions = []
+        if "services" in node:
+            service_expansions = [list(self._expand_node(srv)) for srv in node["services"]]
+            for idx, variants in enumerate(service_expansions):
+                if not variants:
+                    service_expansions[idx] = [copy.deepcopy(node["services"][idx])]
+
+        arg_values = node.get("arg_values")
+        arg_options = arg_values if arg_values else [None]
+        service_variants = product(*service_expansions) if service_expansions else [None]
+
+        for services_combo in service_variants:
+            for arg_choice in arg_options:
+                new_node = copy.deepcopy(node)
+                if services_combo is not None:
+                    new_node["services"] = [copy.deepcopy(srv) for srv in services_combo]
+                if arg_values:
+                    new_node["arg_values"] = [arg_choice]
+                yield new_node
 
     def __iter__(self):
         return self
@@ -133,42 +142,60 @@ SERVICES = [
 if __name__ == "__main__":
     it = WorkflowIterator([
         {
-            "node_name": "first",
-            "type": "sequential",
+            "type": "and",
             "services": [
                 {
-                    "node_name": "first",
-                    "type": "exponentialop",
-                    "arg_name": "max",
-                    "arg_values": [
-                        25000000,
-                        50000000
+                    "type": "sequential",
+                    "services": [
+                        {
+                            "node_name": "first",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                50000000,
+                                100000000
+                            ]
+                        },
+                        {
+                            "node_name": "second",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                50000000,
+                                100000000
+                            ]
+                        }
                     ]
                 },
                 {
-                    "node_name": "second",
-                    "type": "exponentialop",
-                    "arg_name": "max",
-                    "arg_values": [
-                        25000000,
-                        50000000
+                    "type": "sequential",
+                    "services": [
+                        {
+                            "node_name": "third",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                25000000,
+                                50000000
+                            ]
+                        },
+                        {
+                            "node_name": "fourth",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                25000000,
+                                50000000
+                            ]
+                        }
                     ]
                 }
             ]
-        },
-        {
-            "node_name": "second",
-            "type": "deterministic",
-            "arg_name": "millis",
-            "arg_values": [
-                100,
-                500,
-                1000
-            ]
         }])
 
-    for i, (arg_comb, calls) in enumerate(it):
-        print(calls)
+    for i, arg_comb in enumerate(it):
+        for arg in arg_comb:
+            print(get_workflow(arg))
 
 
 # workflow parses the workflow and returns the api that must be called

@@ -45,16 +45,25 @@ def run_test(options: dict, core_combination: list[int], arg_combination: list[i
 
     env = os.environ.copy()
     env.clear()
+
+    def _iter_leaf_workflows(node, path):
+        if not isinstance(node, dict):
+            return
+        services = node.get("services")
+        if services:
+            for idx, srv in enumerate(services):
+                yield from _iter_leaf_workflows(srv, path + (idx,))
+        else:
+            yield node, path
+
     #user-def
     for i, workflow in enumerate(options["WORKFLOW"]):
-        env[f"RATE_{i}"] = str(l[i])
-        if "services" in workflow:
-            for j, element in enumerate(workflow.get("services", [])):
-                call_api_url = get_workflow(element)
-                env[f"API_URL_{str(i)+str(j)}"] = call_api_url
-        else:
-            call_api_url = get_workflow(workflow)
-            env[f"API_URL_{i}"] = call_api_url
+        if i < len(l):
+            env[f"RATE_{i}"] = str(l[i])
+        wf_instance = arg_combination[i] if i < len(arg_combination) else workflow
+        for leaf, path in _iter_leaf_workflows(wf_instance, (i,)):
+            call_api_url = get_workflow(leaf)
+            env[f"API_URL_{''.join(map(str, path))}"] = call_api_url
     
     env["OUTPUT_PATH"] = os.path.join(WORK_DIR)
     env["OUTPUT_NAME"] = f"metrics.json"
@@ -62,7 +71,7 @@ def run_test(options: dict, core_combination: list[int], arg_combination: list[i
     csv = os.path.join(WORK_DIR, f"report.csv")
     env["K6_CSV_TIME_FORMAT"] = "unix_micro"
     env["K6_OUT"] = f"csv={csv}"
-    env["K6_CSV_TIME_FORMAT"] = "unix_micro"
+    #env["K6_CSV_TIME_FORMAT"] = "unix_micro"
     #k6 debug output
     env["K6_WEB_DASHBOARD"] = "false"
     env["K6_WEB_DASHBOARD_EXPORT"] = os.path.join(WORK_DIR, f"report.html")
@@ -135,7 +144,6 @@ if __name__ == '__main__':
 
     os.makedirs(WORK_DIR, exist_ok=True)
     options = get_test_options(args.path)
-
 
     # All possible combinations of cores for each node
     core_combinations = [

@@ -2,6 +2,29 @@ import os
 import argparse
 import json
 
+def extract_unique_pairs(workflow):
+    unique_pairs = []
+    seen = set()
+
+    def visit(node):
+        node_type = node.get("type")
+        arg_values = tuple(node.get("arg_values", []))
+        if node_type and arg_values:
+            key = (node_type, arg_values)
+            if key not in seen:
+                seen.add(key)
+                unique_pairs.append({
+                    "type": node_type,
+                    "arg_values": list(arg_values),
+                })
+        for child in node.get("services", []):
+            visit(child)
+
+    for root in workflow:
+        visit(root)
+
+    return unique_pairs
+
 def extract_arg_values(nodes):
     """
     Recursively extract 'arg_values' from a list of objects (forest of trees).
@@ -26,6 +49,8 @@ def extract_arg_values(nodes):
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the tests")
+    # General args
+    parser.add_argument('--v1', action='store_true', help='Run the v1 tests')
     # Test args
     parser.add_argument('--path', type=str, default=None, help='Path to folder with experiments.json file')
     # Test type

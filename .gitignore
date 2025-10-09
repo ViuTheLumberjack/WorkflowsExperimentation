@@ -11,4 +11,7 @@ tests/k6/__pycache__/
 tests/k6/downloads/*
 tests/k6/work_dir
 tests/k6/*/dockerfiles/
-tests/k6/*/test/
+tests/k6/*/*/test
+tests/k6/*/*/test.js
+tests/k6/*/*/dockerfiles
+
