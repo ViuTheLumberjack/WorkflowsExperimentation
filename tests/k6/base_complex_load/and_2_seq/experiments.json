@@ -4,7 +4,7 @@
         {
             "name": "first",
             "cores": [
-                3
+                2
             ]
         },
         {
@@ -16,7 +16,7 @@
         {
             "name": "third",
             "cores": [
-                3
+                2
             ]
         },
         {
@@ -77,7 +77,7 @@
     ],
     "load": {
         "start": 1,
-        "end": 2,
+        "end": 21,
         "loads": [
             {
                 "type": "closed_loop",
