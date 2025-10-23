@@ -1,0 +1,135 @@
+{
+    "name": "complex",
+    "nodes": [
+        {
+            "name": "2_second",
+            "cores": [
+                1
+            ]
+        },
+        {
+            "name": "3_third",
+            "cores": [
+                1
+            ]
+        },
+        {
+            "name": "4_fourth",
+            "cores": [
+                1
+            ]
+        },
+        {
+            "name": "5_fifth",
+            "cores": [
+                1
+            ]
+        },
+        {
+            "name": "6_sixth",
+            "cores": [
+                1
+            ]
+        },
+	{
+	    "name": "7_seventh",
+	    "cores": [
+		1
+	    ]
+	}
+    ],
+    "workflow": [
+        {
+            "type": "sequential",
+            "services": [
+                {
+                    "type": "or",
+                    "probability": 0.3,
+                    "services": [
+                        {
+                            "type": "sequential",
+                            "services": [
+                                {
+                                    "node_name": "2_second",
+                                    "type": "exponentialop",
+                                    "arg_name": "max",
+                                    "arg_values": [
+                                        25000000
+                                    ]
+                                },
+                                {
+                                    "type": "and",
+                                    "services": [
+                                        {
+                                            "node_name": "3_third",
+                                            "type": "exponentialop",
+                                            "arg_name": "max",
+                                            "arg_values": [
+                                                25000000
+                                            ]
+                                        },
+                                        {
+                                            "node_name": "4_fourth",
+                                            "type": "exponentialop",
+                                            "arg_name": "max",
+                                            "arg_values": [
+                                                25000000
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "sequential",
+                            "services": [
+                                {
+                                    "node_name": "5_fifth",
+                                    "type": "exponentialop",
+                                    "arg_name": "max",
+                                    "arg_values": [
+                                        25000000
+                                    ]
+                                },
+                                {
+                                    "type": "or",
+                                    "probability": 0.3,
+                                    "services": [
+                                        {
+                                            "node_name": "6_sixth",
+                                            "type": "exponentialop",
+                                            "arg_name": "max",
+                                            "arg_values": [
+                                                25000000
+                                            ]
+                                        },
+                                        {
+                                            "node_name": "7_seventh",
+                                            "type": "exponentialop",
+                                            "arg_name": "max",
+                                            "arg_values": [
+                                                25000000
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "load": {
+        "start": 1,
+        "end": 51,
+        "loads": [
+            {
+                "type": "open_loop",
+                "users": [
+                    15
+                ]
+            }
+        ]
+    }
+}

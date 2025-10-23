@@ -1,0 +1,91 @@
+{
+    "name": "or_2_seq",
+    "nodes": [
+        {
+            "name": "first",
+            "cores": [
+                2
+            ]
+        },
+        {
+            "name": "second",
+            "cores": [
+                2
+            ]
+        },
+        {
+            "name": "third",
+            "cores": [
+                2
+            ]
+        },
+        {
+            "name": "fourth",
+            "cores": [
+                2
+            ]
+        }
+    ],
+    "workflow": [
+        {
+            "type": "or",
+            "probability": 0.3,
+            "services": [
+                {
+                    "type": "sequential",
+                    "services": [
+                        {
+                            "node_name": "first",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                50000000
+                            ]
+                        },
+                        {
+                            "node_name": "second",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                50000000
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "sequential",
+                    "services": [
+                        {
+                            "node_name": "third",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                25000000
+                            ]
+                        },
+                        {
+                            "node_name": "fourth",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                25000000
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "load": {
+        "start": 1,
+        "end": 101,
+        "loads": [
+            {
+                "type": "open_loop",
+                "users": [
+                    20
+                ]
+            }
+        ]
+    }
+}

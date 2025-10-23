@@ -1,0 +1,90 @@
+{
+    "name": "and_2_seq",
+    "nodes": [
+        {
+            "name": "first",
+            "cores": [
+                1
+            ]
+        },
+        {
+            "name": "second",
+            "cores": [
+                1
+            ]
+        },
+        {
+            "name": "third",
+            "cores": [
+                1
+            ]
+        },
+        {
+            "name": "fourth",
+            "cores": [
+                1
+            ]
+        }
+    ],
+    "workflow": [
+        {
+            "type": "and",
+            "services": [
+                {
+                    "type": "sequential",
+                    "services": [
+                        {
+                            "node_name": "first",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                50000000
+                            ]
+                        },
+                        {
+                            "node_name": "second",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                50000000
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "sequential",
+                    "services": [
+                        {
+                            "node_name": "third",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                25000000
+                            ]
+                        },
+                        {
+                            "node_name": "fourth",
+                            "type": "exponentialop",
+                            "arg_name": "max",
+                            "arg_values": [
+                                25000000
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "load": {
+        "start": 1,
+        "end": 51,
+        "loads": [
+            {
+                "type": "closed_loop",
+                "users": [
+                    5
+                ]
+            }
+        ]
+    }
+}

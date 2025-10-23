@@ -5,6 +5,8 @@ tests/env/
 tests/k6/*/*/load
 tests/k6/*/*/performance
 tests/k6/*/*/results
+tests/k6/*/*/plots
+tests/k6/*/*/plots_*
 node_modules/
 tests/__pycache__/
 tests/k6/__pycache__/

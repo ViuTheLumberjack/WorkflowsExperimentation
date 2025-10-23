@@ -34,9 +34,9 @@ services:
           cpus: '3'
           memory: 1024M
     volumes:
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
+      - /home/silviu/WorkflowsExperimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /home/silviu/WorkflowsExperimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+      - /home/silviu/WorkflowsExperimentation/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
   second:
     image: jboss/wildfly:latest
     container_name: second
@@ -57,9 +57,9 @@ services:
           cpus: '2'
           memory: 1024M
     volumes:
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
+      - /home/silviu/WorkflowsExperimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /home/silviu/WorkflowsExperimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+      - /home/silviu/WorkflowsExperimentation/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
   third:
     image: jboss/wildfly:latest
     container_name: third
@@ -80,6 +80,6 @@ services:
           cpus: '3'
           memory: 1024M
     volumes:
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
-      - /mnt/s/Projects/qesm/docker-workflows-experimentation/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
+      - /home/silviu/WorkflowsExperimentation/target/ROOT.war:/opt/jboss/wildfly/standalone/deployments/ROOT.war
+      - /home/silviu/WorkflowsExperimentation/opentelemetry-javaagent.jar:/usr/local/opentelemetry-javaagent.jar
+      - /home/silviu/WorkflowsExperimentation/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
